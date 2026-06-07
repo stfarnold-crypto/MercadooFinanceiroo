@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trader Performance Dashboard Pro</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<div class="glass header">
+<div><h1>Arnold Marques</h1><span>Calendário de Performance</span></div>
+<div class="stats">
+<div class="card"><canvas id="annualSparkline" class="summarySparkline"></canvas><small>Resultado Anual</small><h2 id="annualTotal">R$ 0,00</h2></div>
+<div class="card"><canvas id="allTimeSparkline" class="summarySparkline"></canvas><small>Acumulado Histórico</small><h2 id="allTimeTotal">R$ 0,00</h2></div>
+</div>
+</div>
+
+<div class="toolbar glass">
+<button id="prev">◀</button>
+<h2 id="monthLabel"></h2>
+<button id="next">▶</button>
+<label>Ano <input id="year" type="number" value="2026"></label>
+</div>
+
+<div class="glass quarterPanel">
+<h2>Resultado Trimestral</h2>
+<div id="quarterGrid" class="quarterGrid">
+<div class="quarterCard" data-quarter="1"><div class="quarterNumber">1</div><div class="quarterInfo"><div class="quarterMonths"><span>JAN</span><span>FEV</span><span>MAR</span></div><div id="quarterTotal1" class="quarterValue">R$ 0,00</div></div></div>
+<div class="quarterCard" data-quarter="2"><div class="quarterNumber">2</div><div class="quarterInfo"><div class="quarterMonths"><span>ABR</span><span>MAI</span><span>JUN</span></div><div id="quarterTotal2" class="quarterValue">R$ 0,00</div></div></div>
+<div class="quarterCard" data-quarter="3"><div class="quarterNumber">3</div><div class="quarterInfo"><div class="quarterMonths"><span>JUL</span><span>AGO</span><span>SET</span></div><div id="quarterTotal3" class="quarterValue">R$ 0,00</div></div></div>
+<div class="quarterCard" data-quarter="4"><div class="quarterNumber">4</div><div class="quarterInfo"><div class="quarterMonths"><span>OUT</span><span>NOV</span><span>DEZ</span></div><div id="quarterTotal4" class="quarterValue">R$ 0,00</div></div></div>
+</div>
+</div>
+
+<div class="glass advancedPanel">
+<div class="advancedHeader">
+<div><h2>Seleção Avançada</h2><span>Arraste pelos dias ou marque os meses desejados</span></div>
+<button id="selectionMode" class="advancedAction" type="button">Selecionar dias</button>
+</div>
+<div class="advancedGrid">
+<div class="advancedBox">
+<small>Dias selecionados</small>
+<h3 id="selectedDaysTotal">R$ 0,00</h3>
+<p><span id="selectedDaysCount">0</span> dia(s)</p>
+<button id="clearSelectedDays" class="ghostButton" type="button">Limpar seleção</button>
+</div>
+<div class="advancedBox monthBox">
+<small>Meses selecionados</small>
+<h3 id="selectedMonthsTotal">R$ 0,00</h3>
+<p><span id="selectedMonthsCount">12</span> mês(es)</p>
+<div id="monthSelector" class="monthSelector">
+<label><input type="checkbox" value="0" checked>JAN</label>
+<label><input type="checkbox" value="1" checked>FEV</label>
+<label><input type="checkbox" value="2" checked>MAR</label>
+<label><input type="checkbox" value="3" checked>ABR</label>
+<label><input type="checkbox" value="4" checked>MAI</label>
+<label><input type="checkbox" value="5" checked>JUN</label>
+<label><input type="checkbox" value="6" checked>JUL</label>
+<label><input type="checkbox" value="7" checked>AGO</label>
+<label><input type="checkbox" value="8" checked>SET</label>
+<label><input type="checkbox" value="9" checked>OUT</label>
+<label><input type="checkbox" value="10" checked>NOV</label>
+<label><input type="checkbox" value="11" checked>DEZ</label>
+</div>
+</div>
+</div>
+</div>
+
+<div class="weekdays">
+<div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div>
+</div>
+<div id="calendar" class="calendar"></div>
+
+<div id="modal" class="modal hidden">
+<div class="modalBox">
+<h3 id="dateTitle"></h3>
+<input id="result" type="number" step="0.01" placeholder="Resultado R$">
+<input id="points" type="number" placeholder="Pontos">
+<input id="ops" type="number" placeholder="Operações">
+<select id="dayType">
+<option value="">Operado</option>
+<option value="holiday">Feriado</option>
+<option value="notOperated">Dia não Operado</option>
+</select>
+<button id="save">Salvar</button>
+<button id="clearDay">Limpar dados</button>
+<button id="close">Fechar</button>
+</div></div>
+<div class="glass chartsPanel">
+<h2>Curva de Capital (Equity Curve)</h2>
+<canvas id="equityChart"></canvas>
+<h2>Resultado Mensal</h2>
+<canvas id="monthlyChart"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script></body></html>
