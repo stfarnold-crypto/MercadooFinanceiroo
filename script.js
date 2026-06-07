@@ -7,6 +7,9 @@ let selectedDayKeys=new Set();
 let advancedSelectionActive=false;
 let dragSelecting=false;
 let selectionMouseupBound=false;
+let operationsChartMode='month';
+let operationsRangeStart='';
+let operationsRangeEnd='';
 
 function totals(){
  let all=0, yearTotal=0, y=year.value;
@@ -43,9 +46,9 @@ function render(){
  totals();
 }
 
-function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=k;result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';}
-save.onclick=()=>{let d=db();d[selected]={result:+result.value||0,points:+points.value||0,ops:+ops.value||0,dayType:dayType.value||''};saveDb(d);modal.classList.add('hidden');render();}
-clearDay.onclick=()=>{let d=db();delete d[selected];saveDb(d);result.value='';points.value='';ops.value='';dayType.value='';modal.classList.add('hidden');render();}
+function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=k;result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';updateOperationFields(v.operationResults||[]);}
+save.onclick=()=>{let d=db();let operationResults=readOperationValues();let resultValue=operationResults.length>=2?sumOperationValues(operationResults):(+result.value||0);d[selected]={result:resultValue,points:+points.value||0,ops:+ops.value||0,dayType:dayType.value||'',operationResults:operationResults};saveDb(d);modal.classList.add('hidden');render();}
+clearDay.onclick=()=>{let d=db();delete d[selected];saveDb(d);result.value='';points.value='';ops.value='';dayType.value='';updateOperationFields([]);modal.classList.add('hidden');render();}
 close.onclick=()=>modal.classList.add('hidden');
 prev.onclick=()=>{month=(month+11)%12;render()}
 next.onclick=()=>{month=(month+1)%12;render()}
@@ -55,6 +58,74 @@ render();
 
 function formatBRL(v){
  return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
+
+function formatDateBR(key){
+ const parts=String(key||'').split('-');
+ if(parts.length!==3) return key;
+ return `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
+}
+
+function getDayResultForKey(data,key){
+ return Number((data[key]||{}).result||0);
+}
+
+function sumOperationValues(values){
+ return values.reduce((total,value)=>total+Number(value||0),0);
+}
+
+function readOperationValues(){
+ return Array.from(document.querySelectorAll('.operationValue')).map(input=>Number(input.value||0));
+}
+
+function syncOperationTotal(){
+ const values=readOperationValues();
+ if(values.length>=2){
+   result.value=sumOperationValues(values).toFixed(2);
+ }
+}
+
+function updateOperationFields(savedValues=[]){
+ const holder=document.getElementById('operationFields');
+ if(!holder) return;
+ const count=Math.max(savedValues.length,Math.max(0,Math.floor(Number(ops.value||0))));
+ holder.innerHTML='';
+ result.readOnly=count>=2;
+ result.classList.toggle('calculatedResult',count>=2);
+ if(count<2){
+   return;
+ }
+ for(let i=0;i<count;i++){
+   const label=document.createElement('label');
+   label.className='operationField';
+   label.innerHTML=`<span>Operação ${i+1}</span><input class="operationValue" type="number" step="0.01" placeholder="Resultado R$">`;
+   const input=label.querySelector('input');
+   input.value=savedValues[i]!==undefined ? savedValues[i] : '';
+   input.oninput=syncOperationTotal;
+   holder.appendChild(label);
+ }
+ syncOperationTotal();
+}
+
+function getOperationEntries(data,scope){
+ const selectedYear=year.value;
+ return Object.keys(data).sort().flatMap(key=>{
+   if(!key.startsWith(selectedYear+'-')) return [];
+   const dt=new Date(key+'T00:00:00');
+   if(scope==='month' && dt.getMonth()!==month) return [];
+   if(operationsRangeStart && key<operationsRangeStart) return [];
+   if(operationsRangeEnd && key>operationsRangeEnd) return [];
+   const dayData=data[key]||{};
+   if(dayData.dayType==='holiday' || dayData.dayType==='notOperated') return [];
+   const saved=Array.isArray(dayData.operationResults) ? dayData.operationResults : [];
+   const fallback=(Number(dayData.ops||0)>0 || Number(dayData.result||0)!==0) ? [Number(dayData.result||0)] : [];
+   const values=saved.length ? saved : fallback;
+   return values.map((value,index)=>({
+     key,
+     value:Number(value||0),
+     label:formatDateBR(key)
+   }));
+ });
 }
 
 const _oldTotals = totals;
@@ -190,7 +261,7 @@ function drawCharts(){
    if(monthlyChartInstance) monthlyChartInstance.destroy();
    monthlyChartInstance=new Chart(mctx,{
       type:'bar',
-      data:{labels:m,datasets:[{label:'Resultado Mensal',data:monthly}]},
+      data:{labels:m,datasets:[{label:'Operações',data:monthly}]},
       options:{responsive:true}
    });
  }
@@ -213,6 +284,37 @@ function drawCharts(){
  });
 
  const isPositiveCurve=(equity.length===0 || equity[equity.length-1] >= 0);
+ const externalEquityTooltip=context=>{
+   const {chart,tooltip}=context;
+   let tooltipEl=document.getElementById('equityTooltip');
+   if(!tooltipEl){
+     tooltipEl=document.createElement('div');
+     tooltipEl.id='equityTooltip';
+     tooltipEl.className='equityTooltip';
+     document.body.appendChild(tooltipEl);
+   }
+   if(tooltip.opacity===0){
+     tooltipEl.style.opacity=0;
+     return;
+   }
+   const point=tooltip.dataPoints && tooltip.dataPoints[0];
+   if(!point) return;
+   const key=chart.data.labels[point.dataIndex];
+   const daily=getDayResultForKey(data,key);
+   const patrimony=point.parsed.y;
+   const positive=patrimony>=0;
+   tooltipEl.classList.toggle('negative',!positive);
+   tooltipEl.innerHTML=`
+     <div class="equityTooltipDate">${formatDateBR(key)}</div>
+     <div class="equityTooltipLabel">Patrimônio</div>
+     <div class="equityTooltipValue">${formatBRL(patrimony)}</div>
+     <div class="equityTooltipResult">${daily>=0?'+':''}${formatBRL(daily)}</div>
+   `;
+   const rect=chart.canvas.getBoundingClientRect();
+   tooltipEl.style.opacity=1;
+   tooltipEl.style.left=rect.left+window.pageXOffset+tooltip.caretX+'px';
+   tooltipEl.style.top=rect.top+window.pageYOffset+tooltip.caretY+'px';
+ };
  const zeroLinePlugin={
    id:'zeroLinePlugin',
    afterDraw(chart){
@@ -241,13 +343,17 @@ function drawCharts(){
    const chartGradient=ctx=>{
      const chart=ctx.chart;
      const area=chart.chartArea;
-     if(!area) return 'rgba(32,247,164,.2)';
+     if(!area) return isPositiveCurve ? 'rgba(32,247,164,.24)' : 'rgba(255,93,115,.24)';
      const g=chart.ctx.createLinearGradient(0,area.top,0,area.bottom);
-     g.addColorStop(0,'rgba(32,247,164,.42)');
-     g.addColorStop(.48,'rgba(32,247,164,.16)');
-     g.addColorStop(.5,'rgba(255,255,255,.02)');
-     g.addColorStop(.52,'rgba(255,93,115,.16)');
-     g.addColorStop(1,'rgba(255,93,115,.42)');
+     if(isPositiveCurve){
+       g.addColorStop(0,'rgba(32,247,164,.5)');
+       g.addColorStop(.5,'rgba(32,247,164,.2)');
+       g.addColorStop(1,'rgba(0,0,0,.14)');
+     }else{
+       g.addColorStop(0,'rgba(255,93,115,.5)');
+       g.addColorStop(.5,'rgba(255,93,115,.2)');
+       g.addColorStop(1,'rgba(0,0,0,.14)');
+     }
      return g;
    };
    equityChartInstance=new Chart(ectx,{
@@ -263,9 +369,10 @@ function drawCharts(){
           borderColor:isPositiveCurve ? '#20f7a4' : '#ff5d73',
           backgroundColor:chartGradient,
           pointRadius:0,
-          pointHoverRadius:5,
-          pointHoverBackgroundColor:'#ffffff',
-          pointHoverBorderWidth:2,
+          pointHoverRadius:7,
+          pointHoverBackgroundColor:isPositiveCurve ? '#20f7a4' : '#ff5d73',
+          pointHoverBorderColor:'#ffffff',
+          pointHoverBorderWidth:3,
           segment:{
             borderColor:ctx=>ctx.p1.parsed.y>=0 ? '#20f7a4' : '#ff5d73',
             backgroundColor:ctx=>ctx.p1.parsed.y>=0 ? 'rgba(32,247,164,.24)' : 'rgba(255,93,115,.24)'
@@ -280,10 +387,8 @@ function drawCharts(){
           legend:{display:false},
           title:{display:true,text:'Patrimônio',color:'#ffffff',font:{size:16,weight:'700'}},
           tooltip:{
-            backgroundColor:'rgba(8,12,22,.94)',
-            borderColor:'rgba(255,255,255,.14)',
-            borderWidth:1,
-            callbacks:{label:ctx=>'Patrimônio: '+formatBRL(ctx.parsed.y)}
+            enabled:false,
+            external:externalEquityTooltip
           }
         },
         scales:{
@@ -300,13 +405,46 @@ function drawCharts(){
    });
  }
 
- let monthly=new Array(12).fill(0);
- keys.forEach(k=>{
-   const dt=new Date(k+'T00:00:00');
-   monthly[dt.getMonth()]+=Number(data[k].result||0);
- });
-
- const colors=monthly.map(v=>v>=0 ? '#00ff66' : '#ff3333');
+ const operationEntries=getOperationEntries(data,operationsChartMode);
+ const operationLabels=operationEntries.map(entry=>entry.label);
+ const operationValues=operationEntries.map(entry=>entry.value);
+ const operationColors=operationValues.map(v=>v>0 ? '#22b86a' : v<0 ? '#ff454b' : 'rgba(255,255,255,0)');
+ const operationBorderColors=operationValues.map(v=>v>0 ? '#0d0f0f' : v<0 ? '#0d0f0f' : '#ffffff');
+ const zeroOperationPlugin={
+   id:'zeroOperationPlugin',
+   afterDatasetsDraw(chart){
+     const meta=chart.getDatasetMeta(0);
+     const yScale=chart.scales.y;
+     if(!meta || !yScale) return;
+     const zeroY=yScale.getPixelForValue(0);
+     const ctx=chart.ctx;
+     ctx.save();
+     ctx.strokeStyle='#ffffff';
+     ctx.lineWidth=3;
+     meta.data.forEach((bar,index)=>{
+       if(Number(operationValues[index]||0)!==0) return;
+       const x=bar.x;
+       const width=Math.max(12,(bar.width||22)*.72);
+       ctx.beginPath();
+       ctx.moveTo(x-width/2,zeroY);
+       ctx.lineTo(x+width/2,zeroY);
+       ctx.stroke();
+     });
+     ctx.restore();
+   }
+ };
+ const operationsBackgroundPlugin={
+   id:'operationsBackgroundPlugin',
+   beforeDraw(chart){
+     const ctx=chart.ctx;
+     const area=chart.chartArea;
+     if(!area) return;
+     ctx.save();
+     ctx.fillStyle='#202020';
+     ctx.fillRect(area.left,area.top,area.right-area.left,area.bottom-area.top);
+     ctx.restore();
+   }
+ };
 
  const mctx=document.getElementById('monthlyChart');
  if(mctx){
@@ -314,23 +452,49 @@ function drawCharts(){
    monthlyChartInstance=new Chart(mctx,{
       type:'bar',
       data:{
-        labels:m,
+        labels:operationLabels,
         datasets:[{
-          label:'Resultado Mensal',
-          data:monthly,
-          backgroundColor:colors,
-          borderColor:colors,
-          borderWidth:1
+          label:'Operações',
+          data:operationValues,
+          backgroundColor:operationColors,
+          borderColor:operationBorderColors,
+          borderWidth:2,
+          borderSkipped:false,
+          barPercentage:.72,
+          categoryPercentage:.82
         }]
       },
       options:{
         responsive:true,
-        plugins:{legend:{labels:{color:'#ffffff'}}},
+        maintainAspectRatio:false,
+        plugins:{
+          legend:{display:false},
+          title:{display:true,text:'Operações',color:'#ffffff',font:{size:16,weight:'700',family:'Georgia, serif'}},
+          tooltip:{
+            backgroundColor:'rgba(8,8,8,.94)',
+            borderColor:'rgba(255,255,255,.2)',
+            borderWidth:1,
+            callbacks:{
+              label:ctx=>'Resultado: '+formatBRL(ctx.parsed.y)
+            }
+          }
+        },
         scales:{
-          x:{ticks:{color:'#cccccc'},grid:{color:'rgba(255,255,255,.08)'}},
-          y:{ticks:{color:'#cccccc'},grid:{color:'rgba(255,255,255,.08)'}}
+          x:{
+            ticks:{color:'#ffffff',maxRotation:0,minRotation:0,font:{size:11}},
+            grid:{display:false},
+            border:{color:'#242424'}
+          },
+          y:{
+            position:'right',
+            ticks:{color:'#ffffff',callback:value=>Number(value).toLocaleString('pt-BR')},
+            title:{display:true,text:'Saldo (R$)',color:'#ffffff'},
+            grid:{color:'rgba(255,255,255,.08)',lineWidth:1},
+            border:{display:false}
+          }
         }
-      }
+      },
+      plugins:[operationsBackgroundPlugin,zeroOperationPlugin]
    });
  }
 
@@ -492,6 +656,33 @@ function attachDaySelectionEvents(){
  }
 }
 
+function setupOperationControls(){
+ const monthButton=document.getElementById('operationsMonthView');
+ const yearButton=document.getElementById('operationsYearView');
+ const startInput=document.getElementById('operationsStartDate');
+ const endInput=document.getElementById('operationsEndDate');
+ const setMode=mode=>{
+   operationsChartMode=mode;
+   if(monthButton) monthButton.classList.toggle('active',mode==='month');
+   if(yearButton) yearButton.classList.toggle('active',mode==='year');
+   drawCharts();
+ };
+ const setRange=()=>{
+   operationsRangeStart=startInput ? startInput.value : '';
+   operationsRangeEnd=endInput ? endInput.value : '';
+   drawCharts();
+ };
+ if(monthButton) monthButton.onclick=()=>setMode('month');
+ if(yearButton) yearButton.onclick=()=>setMode('year');
+ if(startInput) startInput.onchange=setRange;
+ if(endInput) endInput.onchange=setRange;
+ if(ops){
+   ops.oninput=function(){
+     updateOperationFields(readOperationValues());
+   };
+ }
+}
+
 function setupAdvancedControls(){
  const selectionMode=document.getElementById('selectionMode');
  const clearSelectedDays=document.getElementById('clearSelectedDays');
@@ -527,6 +718,7 @@ function setupAdvancedControls(){
 }
 
 window.addEventListener('load', function () {
+  setupOperationControls();
   setupAdvancedControls();
 });
 

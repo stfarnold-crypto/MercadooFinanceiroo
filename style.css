@@ -689,12 +689,177 @@ input:focus,select:focus{
  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }
 
+#monthlyChart{
+ height:420px !important;
+ background:#202020 !important;
+ border-color:#2d2d2d;
+ border-radius:4px;
+}
+
 #equityChart{
  height:420px !important;
  background:
   linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)),
   repeating-linear-gradient(180deg,rgba(255,255,255,.045) 0,rgba(255,255,255,.045) 1px,transparent 1px,transparent 24px),
   linear-gradient(180deg,#171c1f,#101416) !important;
+}
+
+.operationFields{
+ display:flex;
+ flex-direction:column;
+ gap:8px;
+ max-height:220px;
+ overflow:auto;
+ padding-right:2px;
+}
+
+.operationField{
+ display:grid;
+ grid-template-columns:92px 1fr;
+ align-items:center;
+ gap:8px;
+ color:#dce8ff;
+ font-weight:800;
+ font-size:13px;
+}
+
+.operationField input{
+ width:100%;
+}
+
+.calculatedResult{
+ color:#9fffd5;
+ border-color:rgba(32,247,164,.36);
+}
+
+.operationsHeader{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+ margin-top:8px;
+}
+
+.operationsHeader h2{
+ margin:0;
+}
+
+.operationsControls{
+ display:flex;
+ gap:8px;
+ flex-wrap:wrap;
+ align-items:center;
+}
+
+.operationView{
+ min-width:86px;
+ padding:8px 12px;
+ background:linear-gradient(180deg,#25314a,#151d31);
+ color:#f8fbff;
+ box-shadow:0 10px 26px rgba(0,0,0,.2);
+}
+
+.operationView.active{
+ background:linear-gradient(180deg,#23f0a0,#0fb978);
+ color:#061017;
+}
+
+.operationDate{
+ width:142px;
+ min-height:38px;
+ padding:8px 10px;
+ border-radius:10px;
+ color:#f8fbff;
+ background:linear-gradient(180deg,#25314a,#151d31);
+ border:1px solid rgba(255,255,255,.14);
+ box-shadow:0 10px 26px rgba(0,0,0,.2);
+ font-weight:800;
+}
+
+.operationDate::-webkit-calendar-picker-indicator{
+ filter:invert(1);
+ opacity:.86;
+ cursor:pointer;
+}
+
+.equityTooltip{
+ position:absolute;
+ z-index:30;
+ min-width:172px;
+ padding:12px 14px;
+ border-radius:14px;
+ pointer-events:none;
+ opacity:0;
+ transform:translate(-50%,calc(-100% - 16px));
+ transition:opacity .12s ease;
+ background:
+  linear-gradient(145deg,rgba(14,23,34,.96),rgba(6,10,18,.94)),
+  radial-gradient(circle at 16% 10%,rgba(32,247,164,.24),transparent 48%);
+ border:1px solid rgba(32,247,164,.42);
+ box-shadow:0 18px 42px rgba(0,0,0,.46),0 0 24px rgba(32,247,164,.18),inset 0 1px 0 rgba(255,255,255,.12);
+ color:#ffffff;
+ text-align:left;
+}
+
+.equityTooltip:after{
+ content:"";
+ position:absolute;
+ left:50%;
+ bottom:-8px;
+ width:14px;
+ height:14px;
+ transform:translateX(-50%) rotate(45deg);
+ background:#070d16;
+ border-right:1px solid rgba(32,247,164,.42);
+ border-bottom:1px solid rgba(32,247,164,.42);
+}
+
+.equityTooltip.negative{
+ border-color:rgba(255,93,115,.46);
+ box-shadow:0 18px 42px rgba(0,0,0,.46),0 0 24px rgba(255,93,115,.18),inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.equityTooltip.negative:after{
+ border-right-color:rgba(255,93,115,.46);
+ border-bottom-color:rgba(255,93,115,.46);
+}
+
+.equityTooltipDate{
+ color:#b8c2df;
+ font-size:11px;
+ font-weight:900;
+ letter-spacing:0;
+ text-transform:uppercase;
+}
+
+.equityTooltipLabel{
+ margin-top:5px;
+ color:#dce8ff;
+ font-size:12px;
+ font-weight:800;
+}
+
+.equityTooltipValue{
+ margin-top:2px;
+ color:#20f7a4;
+ font-size:20px;
+ font-weight:900;
+ white-space:nowrap;
+}
+
+.equityTooltip.negative .equityTooltipValue{
+ color:#ff5d73;
+}
+
+.equityTooltipResult{
+ margin-top:6px;
+ display:inline-flex;
+ padding:4px 8px;
+ border-radius:999px;
+ background:rgba(255,255,255,.08);
+ color:#f8fbff;
+ font-size:12px;
+ font-weight:900;
 }
 
 /* ===== CONTORNOS NEON DOS DIAS ===== */

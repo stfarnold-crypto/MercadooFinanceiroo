@@ -71,6 +71,7 @@
 <input id="result" type="number" step="0.01" placeholder="Resultado R$">
 <input id="points" type="number" placeholder="Pontos">
 <input id="ops" type="number" placeholder="Operações">
+<div id="operationFields" class="operationFields"></div>
 <select id="dayType">
 <option value="">Operado</option>
 <option value="holiday">Feriado</option>
@@ -83,7 +84,15 @@
 <div class="glass chartsPanel">
 <h2>Curva de Capital (Equity Curve)</h2>
 <canvas id="equityChart"></canvas>
-<h2>Resultado Mensal</h2>
+<div class="operationsHeader">
+<h2>Operações</h2>
+<div class="operationsControls">
+<button id="operationsMonthView" class="operationView active" type="button">Mensal</button>
+<input id="operationsStartDate" class="operationDate" type="date" aria-label="Data inicial">
+<input id="operationsEndDate" class="operationDate" type="date" aria-label="Data final">
+<button id="operationsYearView" class="operationView" type="button">Anual</button>
+</div>
+</div>
 <canvas id="monthlyChart"></canvas>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
