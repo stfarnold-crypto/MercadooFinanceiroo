@@ -1014,3 +1014,419 @@ input:focus,select:focus{
   height:460px !important;
  }
 }
+
+/* ===== RESPONSIVIDADE FINAL ===== */
+html{
+ width:100%;
+ overflow-x:hidden;
+}
+
+body{
+ width:100%;
+ min-width:0;
+ overflow-x:hidden;
+ padding-inline:clamp(10px,2vw,24px);
+}
+
+img,canvas,svg,video{
+ max-width:100%;
+}
+
+.header,
+.toolbar,
+.quarterPanel,
+.advancedPanel,
+.chartsPanel{
+ width:100%;
+ min-width:0;
+}
+
+.stats,
+.advancedGrid,
+.quarterGrid,
+.operationsControls,
+.advancedActions,
+.monthSelector,
+.weekdays,
+.calendar{
+ min-width:0;
+}
+
+.card,
+.advancedBox,
+.quarterCard,
+.day,
+.operationMetric,
+.operationsHeader h2,
+.toolbar h2{
+ min-width:0;
+}
+
+.card h2,
+.advancedBox h3,
+.quarterValue,
+.operationMetric strong,
+.value{
+ overflow-wrap:anywhere;
+}
+
+.weekdays,
+.calendar{
+ grid-template-columns:repeat(7,minmax(0,1fr));
+}
+
+.day{
+ min-width:0;
+ line-height:1.18;
+}
+
+.day > div{
+ min-width:0;
+ overflow-wrap:anywhere;
+}
+
+.toolbar label{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ font-weight:800;
+ color:#dce8ff;
+}
+
+.toolbar input{
+ width:96px;
+}
+
+.operationsControls{
+ justify-content:flex-end;
+}
+
+#equityChart,
+#monthlyChart{
+ width:100% !important;
+ min-width:0;
+ display:block;
+}
+
+#equityChart{
+ height:clamp(280px,34vw,420px) !important;
+}
+
+#monthlyChart{
+ height:clamp(340px,42vw,540px) !important;
+}
+
+.operationsChartFrame.pieMode #monthlyChart{
+ height:clamp(360px,44vw,540px) !important;
+}
+
+@media (max-width:1200px){
+ .quarterGrid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+ }
+
+ .operationsHeader{
+  align-items:flex-start;
+  flex-direction:column;
+ }
+
+ .operationsControls{
+  justify-content:flex-start;
+  width:100%;
+ }
+}
+
+@media (max-width:900px){
+ body{
+  padding:12px;
+ }
+
+ .header{
+  align-items:stretch;
+  flex-direction:column;
+  padding:18px;
+ }
+
+ .stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+ }
+
+ .card{
+  min-width:0;
+  padding:14px;
+ }
+
+ .card h2{
+  font-size:20px;
+ }
+
+ .toolbar{
+  position:relative;
+  top:auto;
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 44px;
+  gap:10px;
+ }
+
+ .toolbar h2{
+  min-width:0;
+  width:auto;
+ }
+
+ .toolbar label{
+  grid-column:1 / -1;
+  justify-content:center;
+ }
+
+ .advancedHeader{
+  align-items:stretch;
+  flex-direction:column;
+ }
+
+ .advancedActions{
+  justify-content:flex-start;
+ }
+
+ .advancedGrid{
+  grid-template-columns:1fr;
+ }
+
+ .monthSelector{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+ }
+
+ .day{
+  min-height:96px;
+  padding:8px;
+  border-radius:14px;
+  font-size:12px;
+ }
+
+ .date{
+  font-size:19px;
+ }
+
+ .value{
+  font-size:15px;
+ }
+}
+
+@media (max-width:680px){
+ .stats{
+  grid-template-columns:1fr;
+ }
+
+ .quarterGrid{
+  grid-template-columns:1fr;
+ }
+
+ .quarterCard{
+  min-height:118px;
+  padding:16px;
+ }
+
+ .quarterNumber{
+  font-size:70px;
+  min-width:46px;
+  -webkit-text-stroke-width:1.5px;
+ }
+
+ .quarterMonths{
+  font-size:16px;
+ }
+
+ .quarterValue{
+  font-size:18px;
+  white-space:normal;
+ }
+
+ .advancedActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  width:100%;
+ }
+
+ .advancedAction{
+  grid-column:1 / -1;
+ }
+
+ .advancedActions button,
+ .operationsControls button,
+ .operationsControls input,
+ .toolbar label,
+ .toolbar input,
+ .modalBox button,
+ .modalBox input,
+ .modalBox select{
+  width:100%;
+ }
+
+ .operationsControls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+ }
+
+ .operationDate{
+  width:100%;
+ }
+
+ .operationsSummaryBar{
+  position:static;
+  margin:0 0 8px;
+  pointer-events:auto;
+ }
+
+ .operationMetric{
+  flex:1 1 calc(50% - 6px);
+  justify-content:space-between;
+ }
+
+ #monthlyChart{
+  height:430px !important;
+ }
+
+ .operationsChartFrame.pieMode #monthlyChart{
+  height:420px !important;
+ }
+}
+
+@media (max-width:520px){
+ body{
+  padding:8px;
+ }
+
+ .glass{
+  border-radius:14px;
+ }
+
+ .header,
+ .quarterPanel,
+ .advancedPanel,
+ .chartsPanel{
+  padding:14px;
+ }
+
+ .header h1{
+  font-size:26px;
+ }
+
+ .toolbar{
+  padding:12px;
+ }
+
+ .toolbar h2{
+  font-size:18px;
+ }
+
+ .weekdays,
+ .calendar{
+  gap:4px;
+ }
+
+ .weekdays div{
+  font-size:11px;
+ }
+
+ .day{
+  min-height:78px;
+  padding:5px;
+  border-width:1px;
+  border-radius:10px;
+  font-size:9.5px;
+  box-shadow:0 8px 20px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.05);
+ }
+
+ .day:hover{
+  transform:none;
+ }
+
+ .day:before{
+  border-radius:9px;
+ }
+
+ .date{
+  font-size:14px;
+ }
+
+ .value{
+  margin-top:4px;
+  font-size:10.5px;
+  line-height:1.08;
+ }
+
+ .monthSelector{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+ }
+
+ .monthSelector label{
+  min-height:36px;
+  font-size:12px;
+ }
+
+ .operationsControls{
+  grid-template-columns:1fr;
+ }
+
+ .operationView{
+  min-width:0;
+ }
+
+ .operationMetric{
+  flex-basis:100%;
+ }
+
+ .modal{
+  align-items:flex-start;
+  overflow:auto;
+  padding:12px 8px;
+ }
+
+ .modalBox{
+  width:100%;
+  max-width:420px;
+  padding:16px;
+ }
+
+ #equityChart{
+  height:300px !important;
+ }
+
+ #monthlyChart{
+  height:390px !important;
+ }
+
+ .operationsChartFrame.pieMode #monthlyChart{
+  height:380px !important;
+ }
+}
+
+@media (max-width:380px){
+ .weekdays,
+ .calendar{
+  gap:3px;
+ }
+
+ .day{
+  min-height:68px;
+  padding:4px;
+  font-size:8.5px;
+ }
+
+ .date{
+  font-size:12px;
+ }
+
+ .value{
+  font-size:9px;
+ }
+
+ .quarterNumber{
+  font-size:58px;
+ }
+
+ .quarterCard{
+  gap:10px;
+ }
+}
