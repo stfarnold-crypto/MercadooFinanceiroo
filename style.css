@@ -468,6 +468,27 @@ body{
  font-weight:600;
 }
 
+.advancedActions{
+ display:flex;
+ align-items:center;
+ justify-content:flex-end;
+ gap:8px;
+ flex-wrap:wrap;
+}
+
+.advancedToggle{
+ min-width:48px;
+ padding:10px 13px;
+ background:linear-gradient(180deg,#25314a,#151d31);
+ color:#f8fbff;
+ box-shadow:0 10px 26px rgba(0,0,0,.2);
+}
+
+.advancedToggle.active{
+ background:linear-gradient(180deg,#23f0a0,#0fb978);
+ color:#061017;
+}
+
 .advancedGrid{
  display:grid;
  grid-template-columns:minmax(240px,.72fr) minmax(320px,1.28fr);
@@ -771,6 +792,15 @@ input:focus,select:focus{
  margin-bottom:0;
 }
 
+.operationsChartFrame.pieMode .operationsSummaryBar{
+ display:none;
+}
+
+.operationsChartFrame.pieMode #monthlyChart{
+ height:540px !important;
+ background:#202020 !important;
+}
+
 .operationsSummaryBar{
  position:absolute;
  top:9px;
@@ -962,4 +992,25 @@ input:focus,select:focus{
   0 0 24px rgba(139,231,255,.58),
   0 14px 34px rgba(0,0,0,.28),
   inset 0 0 14px rgba(139,231,255,.16) !important;
+}
+
+@media (max-width:900px){
+ .advancedActions{
+  justify-content:flex-start;
+ }
+}
+
+@media (max-width:600px){
+ .advancedActions{
+  display:grid;
+  grid-template-columns:1fr 1fr 2fr;
+ }
+
+ .advancedActions button{
+  width:100%;
+ }
+
+ .operationsChartFrame.pieMode #monthlyChart{
+  height:460px !important;
+ }
 }

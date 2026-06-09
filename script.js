@@ -8,11 +8,13 @@ let advancedSelectionActive=false;
 let dragSelecting=false;
 let selectionMouseupBound=false;
 let operationsChartMode='month';
+let operationsVisualizationMode='bar';
 let operationsRangeStart='';
 let operationsRangeEnd='';
 let equityChartMode='month';
 let equityRangeStart='';
 let equityRangeEnd='';
+let calendarResultMode='money';
 
 function totals(){
  let all=0, yearTotal=0, grossLoss=0, y=year.value;
@@ -44,7 +46,7 @@ function render(){
    if((v.result||0)<0)c.classList.add('negative');
    if(v.dayType==='holiday')c.classList.add('holiday');
    if(v.dayType==='notOperated')c.classList.add('not-operated');
-   c.innerHTML=`<div class=date>${day}</div><div class=value>${v.result?'R$ '+Number(v.result).toFixed(2):''}</div><div>${v.points?Number(v.points)+' pts':''}</div><div>${v.ops?Number(v.ops)+' ops':''}</div><div>${v.dayType==='holiday'?'Feriado':v.dayType==='notOperated'?'Dia não Operado':''}</div>`;
+   c.innerHTML=`<div class=date>${day}</div><div class=value>${formatCalendarResult(v.result,d,y)}</div><div>${v.points?Number(v.points)+' pts':''}</div><div>${v.ops?Number(v.ops)+' ops':''}</div><div>${v.dayType==='holiday'?'Feriado':v.dayType==='notOperated'?'Dia não Operado':''}</div>`;
    c.onclick=()=>openModal(key,v);
    calendar.appendChild(c);
  }
@@ -63,6 +65,28 @@ render();
 
 function formatBRL(v){
  return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
+
+function formatPercent(v){
+ return Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+}
+
+function getYearNetTotal(data,selectedYear){
+ return Object.entries(data).reduce((total,[key,value])=>{
+   if(!key.startsWith(selectedYear+'-')) return total;
+   return total+Number(value.result||0);
+ },0);
+}
+
+function formatCalendarResult(value,data,selectedYear){
+ const numericValue=Number(value||0);
+ if(!numericValue) return '';
+ if(calendarResultMode==='percent'){
+   const yearTotal=getYearNetTotal(data,selectedYear);
+   const percent=yearTotal!==0 ? (numericValue/Math.abs(yearTotal))*100 : 0;
+   return (percent>0?'+':'')+formatPercent(percent);
+ }
+ return formatBRL(numericValue);
 }
 
 function setSignedMoneyText(el,value){
@@ -189,6 +213,71 @@ function updateOperationsSummary(values){
  setMetric('operationsTotalCount',values.length,false);
 }
 
+function getEfficiencySlices(values){
+ const total=values.length;
+ const winners=values.filter(value=>Number(value)>0).length;
+ const losers=values.filter(value=>Number(value)<0).length;
+ const ties=values.filter(value=>Number(value)===0).length;
+ return [
+   {label:'Vencedoras',value:winners,color:'#22b86a'},
+   {label:'Perdedoras',value:losers,color:'#ff454b'},
+   {label:'Empatadas',value:ties,color:'#ffffff'}
+ ].filter(slice=>slice.value>0 || total===0);
+}
+
+function getEfficiencyPercent(value,total){
+ if(!total) return 0;
+ return (Number(value||0)/total)*100;
+}
+
+function createEfficiencyLabelsPlugin(total){
+ return {
+   id:'efficiencyLabelsPlugin',
+   afterDatasetsDraw(chart){
+     const meta=chart.getDatasetMeta(0);
+     if(!meta || !meta.data.length) return;
+     const ctx=chart.ctx;
+     ctx.save();
+     ctx.font='700 13px Segoe UI, sans-serif';
+     ctx.textBaseline='middle';
+     meta.data.forEach((arc,index)=>{
+       const raw=chart.data.datasets[0].data[index];
+       if(!raw) return;
+       const label=chart.data.labels[index];
+       const percent=getEfficiencyPercent(raw,total);
+       const text=`${label} (${formatPercent(percent)})`;
+       const props=arc.getProps(['x','y','startAngle','endAngle','outerRadius'],true);
+       const angle=(props.startAngle+props.endAngle)/2;
+       const lineStartX=props.x+Math.cos(angle)*(props.outerRadius-4);
+       const lineStartY=props.y+Math.sin(angle)*(props.outerRadius-4);
+       const lineEndX=props.x+Math.cos(angle)*(props.outerRadius+26);
+       const lineEndY=props.y+Math.sin(angle)*(props.outerRadius+26);
+       const boxWidth=ctx.measureText(text).width+18;
+       const boxHeight=23;
+       const boxX=lineEndX+(Math.cos(angle)>=0?8:-boxWidth-8);
+       const boxY=lineEndY-boxHeight/2;
+       ctx.strokeStyle='rgba(255,255,255,.88)';
+       ctx.lineWidth=1.4;
+       ctx.beginPath();
+       ctx.moveTo(lineStartX,lineStartY);
+       ctx.lineTo(lineEndX,lineEndY);
+       ctx.lineTo(Math.cos(angle)>=0?boxX:boxX+boxWidth,lineEndY);
+       ctx.stroke();
+       ctx.fillStyle='#fff8d8';
+       ctx.strokeStyle='rgba(0,0,0,.42)';
+       ctx.lineWidth=1;
+       ctx.beginPath();
+       ctx.roundRect(boxX,boxY,boxWidth,boxHeight,3);
+       ctx.fill();
+       ctx.stroke();
+       ctx.fillStyle='#202020';
+       ctx.fillText(text,boxX+9,boxY+boxHeight/2);
+     });
+     ctx.restore();
+   }
+ };
+}
+
 const _oldTotals = totals;
 totals = function(){
  let all=0, yearTotal=0, grossLoss=0, y=year.value;
@@ -221,7 +310,7 @@ render = function(){
    if((v.result||0)<0)c.classList.add('negative');
    if(v.dayType==='holiday')c.classList.add('holiday');
    if(v.dayType==='notOperated')c.classList.add('not-operated');
-   c.innerHTML=`<div class=date>${day}</div><div class=value>${v.result?formatBRL(v.result):''}</div><div>${v.points?Number(v.points)+' pts':''}</div><div>${v.ops?Number(v.ops)+' ops':''}</div><div>${v.dayType==='holiday'?'Feriado':v.dayType==='notOperated'?'Dia não Operado':''}</div>`;
+   c.innerHTML=`<div class=date>${day}</div><div class=value>${formatCalendarResult(v.result,d,y)}</div><div>${v.points?Number(v.points)+' pts':''}</div><div>${v.ops?Number(v.ops)+' ops':''}</div><div>${v.dayType==='holiday'?'Feriado':v.dayType==='notOperated'?'Dia não Operado':''}</div>`;
    c.onclick=()=>openModal(key,v);
    calendar.appendChild(c);
  }
@@ -267,7 +356,7 @@ render = function(){
       if(v.dayType==='holiday')c.classList.add('holiday');
       if(v.dayType==='notOperated')c.classList.add('not-operated');
       c.innerHTML=`<div class=date>${day}</div>
-      <div class=value>${v.result?formatBRL(v.result):''}</div>
+      <div class=value>${formatCalendarResult(v.result,data,y)}</div>
       <div>${v.points?Number(v.points)+' pts':''}</div>
       <div>${v.ops?Number(v.ops)+' ops':''}</div>
       <div>${v.dayType==='holiday'?'Feriado':v.dayType==='notOperated'?'Dia não Operado':''}</div>`;
@@ -290,6 +379,7 @@ let allTimeSparklineInstance=null;
 let grossLossSparklineInstance=null;
 
 function drawCharts(){
+ if(typeof Chart==='undefined') return;
  const data=db();
  const selectedYear=year.value;
  const keys=Object.keys(data).filter(k=>k.startsWith(selectedYear+'-')).sort();
@@ -336,6 +426,14 @@ render();
 
 // ===== MELHORIAS VISUAIS AUTOMÁTICAS =====
 function drawCharts(){
+ if(typeof Chart==='undefined'){
+   const data=db();
+   const operationEntries=getOperationEntries(data,operationsChartMode);
+   const operationsChartFrame=document.querySelector('.operationsChartFrame');
+   if(operationsChartFrame) operationsChartFrame.classList.toggle('pieMode',operationsVisualizationMode==='pie');
+   updateOperationsSummary(operationEntries.map(entry=>entry.value));
+   return;
+ }
  const data=db();
  const selectedYear=year.value;
  const keys=getFilteredDateKeys(data,equityChartMode,equityRangeStart,equityRangeEnd);
@@ -512,10 +610,53 @@ function drawCharts(){
    }
  };
 
+ const operationsChartFrame=document.querySelector('.operationsChartFrame');
+ if(operationsChartFrame) operationsChartFrame.classList.toggle('pieMode',operationsVisualizationMode==='pie');
  const mctx=document.getElementById('monthlyChart');
  if(mctx){
    if(monthlyChartInstance) monthlyChartInstance.destroy();
-   monthlyChartInstance=new Chart(mctx,{
+   if(operationsVisualizationMode==='pie'){
+     const efficiencySlices=getEfficiencySlices(operationValues);
+     const totalOperations=operationValues.length;
+     const pieLabels=totalOperations ? efficiencySlices.map(slice=>slice.label) : ['Sem operações'];
+     const pieValues=totalOperations ? efficiencySlices.map(slice=>slice.value) : [1];
+     const pieColors=totalOperations ? efficiencySlices.map(slice=>slice.color) : ['#ffffff'];
+     monthlyChartInstance=new Chart(mctx,{
+       type:'pie',
+       data:{
+         labels:pieLabels,
+         datasets:[{
+           data:pieValues,
+           backgroundColor:pieColors,
+           borderColor:'#161616',
+           borderWidth:3,
+           hoverOffset:5
+         }]
+       },
+       options:{
+         responsive:true,
+         maintainAspectRatio:false,
+         layout:{padding:{top:46,right:120,bottom:34,left:120}},
+         plugins:{
+           legend:{display:false},
+           title:{display:true,text:'Eficiência',color:'#ffffff',font:{size:20,weight:'800'}},
+           tooltip:{
+             backgroundColor:'rgba(8,8,8,.94)',
+             borderColor:'rgba(255,255,255,.2)',
+             borderWidth:1,
+             callbacks:{
+               label:ctx=>{
+                 if(!totalOperations) return 'Sem operações';
+                 return `${ctx.label}: ${ctx.parsed} (${formatPercent(getEfficiencyPercent(ctx.parsed,totalOperations))})`;
+               }
+             }
+           }
+         }
+       },
+       plugins:[operationsBackgroundPlugin,createEfficiencyLabelsPlugin(totalOperations)]
+     });
+   }else{
+     monthlyChartInstance=new Chart(mctx,{
       type:'bar',
       data:{
         labels:operationLabels,
@@ -562,7 +703,8 @@ function drawCharts(){
         }
       },
       plugins:[operationsBackgroundPlugin,zeroOperationPlugin]
-   });
+     });
+   }
  }
 
  drawSummaryCards(data,allKeys);
@@ -743,6 +885,8 @@ function attachDaySelectionEvents(){
 function setupOperationControls(){
  const monthButton=document.getElementById('operationsMonthView');
  const yearButton=document.getElementById('operationsYearView');
+ const barButton=document.getElementById('operationsBarView');
+ const pieButton=document.getElementById('operationsPieView');
  const startInput=document.getElementById('operationsStartDate');
  const endInput=document.getElementById('operationsEndDate');
  const setMode=mode=>{
@@ -756,8 +900,16 @@ function setupOperationControls(){
    operationsRangeEnd=endInput ? endInput.value : '';
    drawCharts();
  };
+ const setVisualization=mode=>{
+   operationsVisualizationMode=mode;
+   if(barButton) barButton.classList.toggle('active',mode==='bar');
+   if(pieButton) pieButton.classList.toggle('active',mode==='pie');
+   drawCharts();
+ };
  if(monthButton) monthButton.onclick=()=>setMode('month');
  if(yearButton) yearButton.onclick=()=>setMode('year');
+ if(barButton) barButton.onclick=()=>setVisualization('bar');
+ if(pieButton) pieButton.onclick=()=>setVisualization('pie');
  if(startInput) startInput.onchange=setRange;
  if(endInput) endInput.onchange=setRange;
  if(ops){
@@ -791,8 +943,20 @@ function setupEquityControls(){
 
 function setupAdvancedControls(){
  const selectionMode=document.getElementById('selectionMode');
+ const calendarMoneyView=document.getElementById('calendarMoneyView');
+ const calendarPercentView=document.getElementById('calendarPercentView');
  const clearSelectedDays=document.getElementById('clearSelectedDays');
  const monthSelector=document.getElementById('monthSelector');
+
+ const setCalendarMode=mode=>{
+   calendarResultMode=mode;
+   if(calendarMoneyView) calendarMoneyView.classList.toggle('active',mode==='money');
+   if(calendarPercentView) calendarPercentView.classList.toggle('active',mode==='percent');
+   render();
+ };
+
+ if(calendarMoneyView) calendarMoneyView.onclick=()=>setCalendarMode('money');
+ if(calendarPercentView) calendarPercentView.onclick=()=>setCalendarMode('percent');
 
  if(selectionMode){
    selectionMode.onclick=function(){

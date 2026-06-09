@@ -30,7 +30,11 @@
 <div class="glass advancedPanel">
 <div class="advancedHeader">
 <div><h2>Seleção Avançada</h2><span>Arraste pelos dias ou marque os meses desejados</span></div>
+<div class="advancedActions">
+<button id="calendarMoneyView" class="advancedToggle active" type="button">R$</button>
+<button id="calendarPercentView" class="advancedToggle" type="button">%</button>
 <button id="selectionMode" class="advancedAction" type="button">Selecionar dias</button>
+</div>
 </div>
 <div class="advancedGrid">
 <div class="advancedBox">
@@ -96,6 +100,8 @@
 <div class="operationsHeader">
 <h2>Operações</h2>
 <div class="operationsControls">
+<button id="operationsBarView" class="operationView active" type="button">Barras</button>
+<button id="operationsPieView" class="operationView" type="button">Pizza</button>
 <button id="operationsMonthView" class="operationView active" type="button">Mensal</button>
 <input id="operationsStartDate" class="operationDate" type="date" aria-label="Data inicial">
 <input id="operationsEndDate" class="operationDate" type="date" aria-label="Data final">
