@@ -6,6 +6,7 @@
 <div class="stats">
 <div class="card"><canvas id="annualSparkline" class="summarySparkline"></canvas><small>Resultado Anual</small><h2 id="annualTotal">R$ 0,00</h2></div>
 <div class="card"><canvas id="allTimeSparkline" class="summarySparkline"></canvas><small>Acumulado Histórico</small><h2 id="allTimeTotal">R$ 0,00</h2></div>
+<div class="card lossCard"><canvas id="grossLossSparkline" class="summarySparkline"></canvas><small>Prejuizo Bruto</small><h2 id="grossLossTotal">R$ 0,00</h2></div>
 </div>
 </div>
 
@@ -82,7 +83,15 @@
 <button id="close">Fechar</button>
 </div></div>
 <div class="glass chartsPanel">
+<div class="operationsHeader">
 <h2>Curva de Capital (Equity Curve)</h2>
+<div class="operationsControls">
+<button id="equityMonthView" class="operationView active" type="button">Mensal</button>
+<input id="equityStartDate" class="operationDate" type="date" aria-label="Data inicial da curva de capital">
+<input id="equityEndDate" class="operationDate" type="date" aria-label="Data final da curva de capital">
+<button id="equityYearView" class="operationView" type="button">Anual</button>
+</div>
+</div>
 <canvas id="equityChart"></canvas>
 <div class="operationsHeader">
 <h2>Operações</h2>
@@ -93,7 +102,16 @@
 <button id="operationsYearView" class="operationView" type="button">Anual</button>
 </div>
 </div>
+<div class="operationsChartFrame">
+<div id="operationsSummaryBar" class="operationsSummaryBar">
+<div class="operationMetric"><span>Resultado Liq Tot.</span><strong id="operationsNetTotal">R$ 0,00</strong></div>
+<div class="operationMetric"><span>Resultado Total</span><strong id="operationsResultTotal">R$ 0,00</strong></div>
+<div class="operationMetric"><span>Lucro Bruto</span><strong id="operationsGrossProfit">R$ 0,00</strong></div>
+<div class="operationMetric"><span>Prejuizo Bruto</span><strong id="operationsGrossLoss">R$ 0,00</strong></div>
+<div class="operationMetric"><span>Operações</span><strong id="operationsTotalCount">0</strong></div>
+</div>
 <canvas id="monthlyChart"></canvas>
+</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="script.js"></script></body></html>

@@ -10,16 +10,21 @@ let selectionMouseupBound=false;
 let operationsChartMode='month';
 let operationsRangeStart='';
 let operationsRangeEnd='';
+let equityChartMode='month';
+let equityRangeStart='';
+let equityRangeEnd='';
 
 function totals(){
- let all=0, yearTotal=0, y=year.value;
+ let all=0, yearTotal=0, grossLoss=0, y=year.value;
  let d=db();
  Object.entries(d).forEach(([k,v])=>{
   all+=Number(v.result||0);
+  grossLoss+=getGrossLossForDay(v);
   if(k.startsWith(y+'-')) yearTotal+=Number(v.result||0);
  });
  annualTotal.innerText='R$ '+yearTotal.toFixed(2);
  allTimeTotal.innerText='R$ '+all.toFixed(2);
+ if(typeof grossLossTotal!=='undefined') grossLossTotal.innerText='R$ '+grossLoss.toFixed(2);
 }
 
 function render(){
@@ -128,16 +133,66 @@ function getOperationEntries(data,scope){
  });
 }
 
+function getFilteredDateKeys(data,scope,startDate,endDate){
+ const selectedYear=year.value;
+ return Object.keys(data).filter(key=>{
+   if(!key.startsWith(selectedYear+'-')) return false;
+   const dt=new Date(key+'T00:00:00');
+   if(scope==='month' && dt.getMonth()!==month) return false;
+   if(startDate && key<startDate) return false;
+   if(endDate && key>endDate) return false;
+   return true;
+ }).sort();
+}
+
+function getGrossLossForDay(dayData){
+ const saved=Array.isArray(dayData.operationResults) ? dayData.operationResults : [];
+ if(saved.length){
+   return saved.reduce((total,value)=>{
+     const result=Number(value||0);
+     return result<0 ? total+result : total;
+   },0);
+ }
+ const result=Number(dayData.result||0);
+ return result<0 ? result : 0;
+}
+
+function updateOperationsSummary(values){
+ const netTotal=values.reduce((total,value)=>total+Number(value||0),0);
+ const grossProfit=values.reduce((total,value)=>{
+   const result=Number(value||0);
+   return result>0 ? total+result : total;
+ },0);
+ const grossLoss=values.reduce((total,value)=>{
+   const result=Number(value||0);
+   return result<0 ? total+result : total;
+ },0);
+ const setMetric=(id,value,isMoney=true)=>{
+   const el=document.getElementById(id);
+   if(!el) return;
+   el.innerText=isMoney ? formatBRL(value) : String(value);
+   el.classList.toggle('metricNegative',Number(value)<0);
+   el.classList.toggle('metricPositive',Number(value)>=0);
+ };
+ setMetric('operationsNetTotal',netTotal);
+ setMetric('operationsResultTotal',netTotal);
+ setMetric('operationsGrossProfit',grossProfit);
+ setMetric('operationsGrossLoss',grossLoss);
+ setMetric('operationsTotalCount',values.length,false);
+}
+
 const _oldTotals = totals;
 totals = function(){
- let all=0, yearTotal=0, y=year.value;
+ let all=0, yearTotal=0, grossLoss=0, y=year.value;
  let d=db();
  Object.entries(d).forEach(([k,v])=>{
   all+=Number(v.result||0);
+  grossLoss+=getGrossLossForDay(v);
   if(k.startsWith(y+'-')) yearTotal+=Number(v.result||0);
  });
  annualTotal.innerText=formatBRL(yearTotal);
  allTimeTotal.innerText=formatBRL(all);
+ if(typeof grossLossTotal!=='undefined') grossLossTotal.innerText=formatBRL(grossLoss);
 }
 
 const _oldRender = render;
@@ -224,6 +279,7 @@ let equityChartInstance=null;
 let monthlyChartInstance=null;
 let annualSparklineInstance=null;
 let allTimeSparklineInstance=null;
+let grossLossSparklineInstance=null;
 
 function drawCharts(){
  const data=db();
@@ -274,12 +330,13 @@ render();
 function drawCharts(){
  const data=db();
  const selectedYear=year.value;
- const keys=Object.keys(data).filter(k=>k.startsWith(selectedYear+'-')).sort();
+ const keys=getFilteredDateKeys(data,equityChartMode,equityRangeStart,equityRangeEnd);
+ const allKeys=Object.keys(data).sort();
 
  let acc=0, labels=[], equity=[];
  keys.forEach(k=>{
    acc+=Number(data[k].result||0);
-   labels.push(k);
+   labels.push(formatDateBR(k));
    equity.push(acc);
  });
 
@@ -299,7 +356,7 @@ function drawCharts(){
    }
    const point=tooltip.dataPoints && tooltip.dataPoints[0];
    if(!point) return;
-   const key=chart.data.labels[point.dataIndex];
+   const key=keys[point.dataIndex];
    const daily=getDayResultForKey(data,key);
    const patrimony=point.parsed.y;
    const positive=patrimony>=0;
@@ -408,6 +465,7 @@ function drawCharts(){
  const operationEntries=getOperationEntries(data,operationsChartMode);
  const operationLabels=operationEntries.map(entry=>entry.label);
  const operationValues=operationEntries.map(entry=>entry.value);
+ updateOperationsSummary(operationValues);
  const operationColors=operationValues.map(v=>v>0 ? '#22b86a' : v<0 ? '#ff454b' : 'rgba(255,255,255,0)');
  const operationBorderColors=operationValues.map(v=>v>0 ? '#0d0f0f' : v<0 ? '#0d0f0f' : '#ffffff');
  const zeroOperationPlugin={
@@ -467,6 +525,7 @@ function drawCharts(){
       options:{
         responsive:true,
         maintainAspectRatio:false,
+        layout:{padding:{top:38}},
         plugins:{
           legend:{display:false},
           title:{display:true,text:'Operações',color:'#ffffff',font:{size:16,weight:'700',family:'Georgia, serif'}},
@@ -498,7 +557,7 @@ function drawCharts(){
    });
  }
 
- drawSummaryCards(data,keys);
+ drawSummaryCards(data,allKeys);
 }
 render();
 
@@ -514,11 +573,25 @@ function buildCumulativeSeries(entries,data){
  return series;
 }
 
-function drawSparkline(canvasId,values,total,previousInstance){
+function buildGrossLossSeries(entries,data){
+ let acc=0;
+ let series=[0];
+ entries.forEach(k=>{
+   const loss=getGrossLossForDay(data[k]||{});
+   if(loss<0){
+     acc+=loss;
+     series.push(acc);
+   }
+ });
+ if(series.length===1) series.push(0);
+ return series;
+}
+
+function drawSparkline(canvasId,values,total,previousInstance,forceNegative=false){
  const canvas=document.getElementById(canvasId);
  if(!canvas) return previousInstance;
  if(previousInstance) previousInstance.destroy();
- const positive=Number(total||0)>=0;
+ const positive=!forceNegative && Number(total||0)>=0;
  const lineColor=positive ? '#20f7a4' : '#ff2f68';
  const fillTop=positive ? 'rgba(32,247,164,.34)' : 'rgba(255,47,104,.34)';
  const fillBottom=positive ? 'rgba(32,247,164,0)' : 'rgba(255,47,104,0)';
@@ -563,10 +636,13 @@ function drawSummaryCards(data,keys){
  const yearKeys=keys.filter(k=>k.startsWith(y+'-'));
  const yearSeries=buildCumulativeSeries(yearKeys,data);
  const allSeries=buildCumulativeSeries(keys,data);
+ const grossLossSeries=buildGrossLossSeries(keys,data);
  const yearTotal=yearSeries[yearSeries.length-1]||0;
  const allTotal=allSeries[allSeries.length-1]||0;
+ const grossLossTotalValue=grossLossSeries[grossLossSeries.length-1]||0;
  annualSparklineInstance=drawSparkline('annualSparkline',yearSeries,yearTotal,annualSparklineInstance);
  allTimeSparklineInstance=drawSparkline('allTimeSparkline',allSeries,allTotal,allTimeSparklineInstance);
+ grossLossSparklineInstance=drawSparkline('grossLossSparkline',grossLossSeries,grossLossTotalValue,grossLossSparklineInstance,true);
 }
 
 function updateQuarterResults(data){
@@ -683,6 +759,28 @@ function setupOperationControls(){
  }
 }
 
+function setupEquityControls(){
+ const monthButton=document.getElementById('equityMonthView');
+ const yearButton=document.getElementById('equityYearView');
+ const startInput=document.getElementById('equityStartDate');
+ const endInput=document.getElementById('equityEndDate');
+ const setMode=mode=>{
+   equityChartMode=mode;
+   if(monthButton) monthButton.classList.toggle('active',mode==='month');
+   if(yearButton) yearButton.classList.toggle('active',mode==='year');
+   drawCharts();
+ };
+ const setRange=()=>{
+   equityRangeStart=startInput ? startInput.value : '';
+   equityRangeEnd=endInput ? endInput.value : '';
+   drawCharts();
+ };
+ if(monthButton) monthButton.onclick=()=>setMode('month');
+ if(yearButton) yearButton.onclick=()=>setMode('year');
+ if(startInput) startInput.onchange=setRange;
+ if(endInput) endInput.onchange=setRange;
+}
+
 function setupAdvancedControls(){
  const selectionMode=document.getElementById('selectionMode');
  const clearSelectedDays=document.getElementById('clearSelectedDays');
@@ -719,6 +817,7 @@ function setupAdvancedControls(){
 
 window.addEventListener('load', function () {
   setupOperationControls();
+  setupEquityControls();
   setupAdvancedControls();
 });
 
