@@ -22,8 +22,8 @@ function totals(){
   grossLoss+=getGrossLossForDay(v);
   if(k.startsWith(y+'-')) yearTotal+=Number(v.result||0);
  });
- annualTotal.innerText='R$ '+yearTotal.toFixed(2);
- allTimeTotal.innerText='R$ '+all.toFixed(2);
+ setSignedMoneyText(annualTotal,yearTotal);
+ setSignedMoneyText(allTimeTotal,all);
  if(typeof grossLossTotal!=='undefined') grossLossTotal.innerText='R$ '+grossLoss.toFixed(2);
 }
 
@@ -51,7 +51,7 @@ function render(){
  totals();
 }
 
-function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=k;result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';updateOperationFields(v.operationResults||[]);}
+function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=formatDateBR(k);result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';updateOperationFields(v.operationResults||[]);}
 save.onclick=()=>{let d=db();let operationResults=readOperationValues();let resultValue=operationResults.length>=2?sumOperationValues(operationResults):(+result.value||0);d[selected]={result:resultValue,points:+points.value||0,ops:+ops.value||0,dayType:dayType.value||'',operationResults:operationResults};saveDb(d);modal.classList.add('hidden');render();}
 clearDay.onclick=()=>{let d=db();delete d[selected];saveDb(d);result.value='';points.value='';ops.value='';dayType.value='';updateOperationFields([]);modal.classList.add('hidden');render();}
 close.onclick=()=>modal.classList.add('hidden');
@@ -63,6 +63,14 @@ render();
 
 function formatBRL(v){
  return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+}
+
+function setSignedMoneyText(el,value){
+ if(!el) return;
+ const numericValue=Number(value||0);
+ el.innerText=formatBRL(numericValue);
+ el.classList.toggle('is-negative',numericValue<0);
+ el.classList.toggle('is-positive',numericValue>=0);
 }
 
 function formatDateBR(key){
@@ -190,8 +198,8 @@ totals = function(){
   grossLoss+=getGrossLossForDay(v);
   if(k.startsWith(y+'-')) yearTotal+=Number(v.result||0);
  });
- annualTotal.innerText=formatBRL(yearTotal);
- allTimeTotal.innerText=formatBRL(all);
+ setSignedMoneyText(annualTotal,yearTotal);
+ setSignedMoneyText(allTimeTotal,all);
  if(typeof grossLossTotal!=='undefined') grossLossTotal.innerText=formatBRL(grossLoss);
 }
 

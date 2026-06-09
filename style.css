@@ -17,7 +17,9 @@ button,input,select{border:none;border-radius:12px;padding:10px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;justify-content:center;align-items:center}
 .hidden{display:none}
 .modalBox{width:340px;background:#10182d;padding:20px;border-radius:20px;display:flex;flex-direction:column;gap:10px}
-#annualTotal{color:var(--green)}
+#annualTotal,#allTimeTotal{color:var(--green)}
+#annualTotal.is-negative,#allTimeTotal.is-negative{color:var(--red)}
+#annualTotal.is-positive,#allTimeTotal.is-positive{color:var(--green)}
 #grossLossTotal{color:var(--red)}
 
 
