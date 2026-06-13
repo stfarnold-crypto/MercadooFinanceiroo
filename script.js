@@ -1,4 +1,13 @@
 
+function loadJournalFields(v){
+ const map=['economicCalendar','globalOverview','dailyStopLoss','profitGoal','maxTrades','assetDirection','entryReason','tradePlan','tradeResult','mistakesMade'];
+ map.forEach(id=>{const el=document.getElementById(id); if(el) el.value=v[id]||'';});
+}
+function collectJournalFields(){
+ const map=['economicCalendar','globalOverview','dailyStopLoss','profitGoal','maxTrades','assetDirection','entryReason','tradePlan','tradeResult','mistakesMade'];
+ const out={}; map.forEach(id=>{const el=document.getElementById(id); out[id]=el?el.value:'';}); return out;
+}
+
 const m=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 let month=new Date().getMonth(), selected='';
 const db=()=>JSON.parse(localStorage.getItem('traderPro')||'{}');
@@ -53,8 +62,8 @@ function render(){
  totals();
 }
 
-function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=formatDateBR(k);result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';updateOperationFields(v.operationResults||[]);}
-save.onclick=()=>{let d=db();let operationResults=readOperationValues();let resultValue=operationResults.length>=2?sumOperationValues(operationResults):(+result.value||0);d[selected]={result:resultValue,points:+points.value||0,ops:+ops.value||0,dayType:dayType.value||'',operationResults:operationResults};saveDb(d);modal.classList.add('hidden');render();}
+function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=formatDateBR(k);result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';updateOperationFields(v.operationResults||[]);loadJournalFields(v);}
+save.onclick=()=>{let d=db();let operationResults=readOperationValues();let resultValue=operationResults.length>=2?sumOperationValues(operationResults):(+result.value||0);d[selected]={result:resultValue,points:+points.value||0,ops:+ops.value||0,dayType:dayType.value||'',operationResults:operationResults,...collectJournalFields()};saveDb(d);modal.classList.add('hidden');render();}
 clearDay.onclick=()=>{let d=db();delete d[selected];saveDb(d);result.value='';points.value='';ops.value='';dayType.value='';updateOperationFields([]);modal.classList.add('hidden');render();}
 close.onclick=()=>modal.classList.add('hidden');
 prev.onclick=()=>{month=(month+11)%12;render()}
@@ -1009,4 +1018,13 @@ window.addEventListener('load', function () {
       return false;
     };
   }
+});
+
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.journalToggle').forEach(toggle=>{
+    toggle.addEventListener('click',()=>{
+      toggle.parentElement.classList.toggle('open');
+    });
+  });
 });

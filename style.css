@@ -1430,3 +1430,38 @@ img,canvas,svg,video{
   gap:10px;
  }
 }
+
+.journalSections{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.journalSections textarea{min-height:70px;resize:vertical;background:#0a1020;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px}
+.journalSections textarea::placeholder{color:rgba(255,255,255,.25)}
+.journalSections textarea:focus::placeholder{color:transparent}
+.journalSections h4{margin:8px 0 2px}
+
+
+.journalToggle{
+cursor:pointer;
+display:flex;
+align-items:center;
+gap:8px;
+user-select:none;
+}
+.toggleArrow{
+transition:transform .2s ease;
+font-size:14px;
+}
+.journalContent{
+display:none;
+flex-direction:column;
+gap:10px;
+}
+.journalGroup.open .journalContent{
+display:flex;
+}
+.journalGroup.open .toggleArrow{
+transform:rotate(90deg);
+}
+.journalSections textarea{
+width:100%;
+min-height:70px;
+margin-bottom:8px;
+}
