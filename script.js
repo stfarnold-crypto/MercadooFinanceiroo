@@ -1225,3 +1225,22 @@ document.addEventListener('DOMContentLoaded',()=>{
     waitForOps();
   }
 })();
+
+
+// ===== TRAVA SCROLL DA PÁGINA AO ABRIR O MODAL =====
+(function(){
+  var modalEl=document.getElementById('modal');
+  if(!modalEl) return;
+  var obs=new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+      if(m.attributeName==='class'){
+        if(modalEl.classList.contains('hidden')){
+          document.body.classList.remove('modal-open');
+        } else {
+          document.body.classList.add('modal-open');
+        }
+      }
+    });
+  });
+  obs.observe(modalEl,{attributes:true});
+})();

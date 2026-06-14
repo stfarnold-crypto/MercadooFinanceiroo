@@ -1862,3 +1862,8 @@ margin-bottom:8px;
   justify-content:center;
  }
 }
+
+/* ===== TRAVA SCROLL DO BODY QUANDO MODAL ESTÁ ABERTO ===== */
+body.modal-open{
+ overflow:hidden;
+}
