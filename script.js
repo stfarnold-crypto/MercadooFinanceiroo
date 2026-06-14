@@ -1226,21 +1226,26 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 })();
 
-
-// ===== TRAVA SCROLL DA PÁGINA AO ABRIR O MODAL =====
+// ===== MODAL: SCROLL LOCK SEM PULAR TELA =====
 (function(){
-  var modalEl=document.getElementById('modal');
-  if(!modalEl) return;
-  var obs=new MutationObserver(function(mutations){
-    mutations.forEach(function(m){
-      if(m.attributeName==='class'){
-        if(modalEl.classList.contains('hidden')){
-          document.body.classList.remove('modal-open');
-        } else {
-          document.body.classList.add('modal-open');
-        }
-      }
-    });
+ var modalEl=document.getElementById('modal');
+ if(!modalEl) return;
+ var scrollY=0;
+ function lock(){
+  scrollY=window.scrollY||window.pageYOffset||0;
+  document.body.style.top='-'+scrollY+'px';
+  document.body.classList.add('modal-open');
+ }
+ function unlock(){
+  document.body.classList.remove('modal-open');
+  document.body.style.top='';
+  window.scrollTo(0,scrollY);
+ }
+ new MutationObserver(function(muts){
+  muts.forEach(function(m){
+   if(m.attributeName==='class'){
+    modalEl.classList.contains('hidden') ? unlock() : lock();
+   }
   });
-  obs.observe(modalEl,{attributes:true});
+ }).observe(modalEl,{attributes:true});
 })();

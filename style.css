@@ -1863,7 +1863,30 @@ margin-bottom:8px;
  }
 }
 
-/* ===== TRAVA SCROLL DO BODY QUANDO MODAL ESTÁ ABERTO ===== */
+/* ===== MODAL: SCROLL NO OVERLAY + Z-INDEX + SCROLL LOCK ===== */
+.modal{
+ z-index:99999;
+ overflow-y:auto;
+ align-items:flex-start;
+ padding:24px 16px;
+ box-sizing:border-box;
+}
+.modalBox{
+ z-index:100000;
+ position:relative;
+ width:min(600px,100%);
+ max-width:100%;
+ max-height:none;
+ overflow:visible;
+ margin:auto 0;
+ box-sizing:border-box;
+}
 body.modal-open{
  overflow:hidden;
+ position:fixed;
+ width:100%;
+}
+@media(max-width:680px){
+ .modal{padding:10px 8px;}
+ .modalBox{width:100%;padding:14px;}
 }
