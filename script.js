@@ -1028,3 +1028,70 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   });
 });
+
+
+// ===== AGENDA DO TRADER — CONTROLE DE ABAS =====
+(function(){
+  var subtitleMap={
+    '1':'Planejamento e diário do dia',
+    '2':'Plano do dia',
+    '3':'Registro de Operações'
+  };
+
+  function activateTab(tabNum){
+    document.querySelectorAll('.agendaTab').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.tab===tabNum);
+    });
+    document.querySelectorAll('.agendaPanel').forEach(function(panel){
+      panel.classList.toggle('active', panel.dataset.panel===tabNum);
+    });
+    var sub=document.getElementById('agendaSubtitle');
+    if(sub) sub.textContent=subtitleMap[tabNum]||'Planejamento e diário do dia';
+  }
+
+  function setupAgendaTabs(){
+    document.querySelectorAll('.agendaTab').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();
+        activateTab(btn.dataset.tab);
+      });
+    });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', setupAgendaTabs);
+  } else {
+    setupAgendaTabs();
+  }
+
+  // Re-init whenever modal opens (render() may replace DOM)
+  var _origOpenModal=typeof openModal==='function' ? openModal : null;
+  if(_origOpenModal){
+    openModal=function(k,v){
+      _origOpenModal(k,v);
+      setupAgendaTabs();
+      activateTab('1');
+    };
+  }
+})();
+
+// Reset agenda para aba 1 sempre que o modal abrir
+(function(){
+  var mo=document.getElementById('modal');
+  if(!mo) return;
+  var obs=new MutationObserver(function(mutations){
+    mutations.forEach(function(m){
+      if(m.attributeName==='class'){
+        var hidden=mo.classList.contains('hidden');
+        if(!hidden){
+          // modal abriu: ativa aba 1
+          document.querySelectorAll('.agendaTab').forEach(function(b){ b.classList.toggle('active',b.dataset.tab==='1'); });
+          document.querySelectorAll('.agendaPanel').forEach(function(p){ p.classList.toggle('active',p.dataset.panel==='1'); });
+          var sub=document.getElementById('agendaSubtitle');
+          if(sub) sub.textContent='Planejamento e diário do dia';
+        }
+      }
+    });
+  });
+  obs.observe(mo,{attributes:true});
+})();

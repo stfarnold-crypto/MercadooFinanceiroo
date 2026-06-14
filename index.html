@@ -83,32 +83,77 @@
 <option value="notOperated">Dia não Operado</option>
 </select>
 
-<div class="journalSections">
+<div class="agendaTrader">
+  <div class="agendaHeader">
+    <span class="agendaTitle">Agenda do Trader</span>
+    <span class="agendaSubtitle" id="agendaSubtitle">Planejamento e diário do dia</span>
+  </div>
+  <div class="agendaTabs">
+    <button class="agendaTab active" data-tab="1" type="button"><span class="agendaTabNum">1</span> Rotina de Pré-Mercado</button>
+    <button class="agendaTab" data-tab="2" type="button"><span class="agendaTabNum">2</span> Gestão de Risco e Metas</button>
+    <button class="agendaTab" data-tab="3" type="button"><span class="agendaTabNum">3</span> Diário de Trading</button>
+  </div>
 
-<div class="journalGroup">
-<h4 class="journalToggle"><span class="toggleArrow">▶</span> 1. Rotina de Pré-Mercado (Checklist)</h4>
-<div class="journalContent">
-<textarea id="economicCalendar" placeholder="Calendário Econômico: Quais são as notícias de alto impacto e seus horários (ex: dados de inflação, payroll, decisões de juros)."></textarea>
-<textarea id="globalOverview" placeholder="Panorama Global: Direção dos mercados internacionais (S&P 500, Nasdaq, índices europeus e asiáticos) e commodities (petróleo, minério de ferro)."></textarea>
-</div></div>
+  <div class="agendaPanel active" data-panel="1">
+    <div class="agendaPanelHeader">
+      <span class="agendaPanelTitle">Rotina de Pré-Mercado</span>
+      <span class="agendaPanelBadge badge-checklist">Checklist</span>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Calendário Econômico:</label>
+      <textarea id="economicCalendar" placeholder="Quais são as notícias de alto impacto e seus horários (ex: dados de inflação, payroll, decisões de juros)."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Panorama Global:</label>
+      <textarea id="globalOverview" placeholder="Direção dos mercados internacionais (S&P 500, Nasdaq, índices europeus e asiáticos) e commodities (petróleo, minério de ferro)."></textarea>
+    </div>
+  </div>
 
-<div class="journalGroup">
-<h4 class="journalToggle"><span class="toggleArrow">▶</span> 2. Gestão de Risco e Metas</h4>
-<div class="journalContent">
-<textarea id="dailyStopLoss" placeholder="Stop Loss Diário: O valor máximo que você aceita perder no dia."></textarea>
-<textarea id="profitGoal" placeholder="Meta de Ganho: O objetivo financeiro do dia."></textarea>
-<textarea id="maxTrades" placeholder="Número Máximo de Trades: Limite de operações por dia."></textarea>
-</div></div>
+  <div class="agendaPanel" data-panel="2">
+    <div class="agendaPanelHeader">
+      <span class="agendaPanelTitle">Gestão de Risco e Metas</span>
+      <span class="agendaPanelBadge badge-plano">Plano do dia</span>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Stop Loss Diário:</label>
+      <textarea id="dailyStopLoss" placeholder="O valor máximo que você aceita perder no dia. Ao atingi-lo, a agenda dita que o computador deve ser fechado."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Meta de Ganho:</label>
+      <textarea id="profitGoal" placeholder="O objetivo financeiro do dia. Ao alcançá-lo, você encerra as operações para devolver menos dinheiro ao mercado."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Número Máximo de Trades:</label>
+      <textarea id="maxTrades" placeholder="Limite de operações por dia para evitar a exaustão e a super alavancagem."></textarea>
+    </div>
+  </div>
 
-<div class="journalGroup">
-<h4 class="journalToggle"><span class="toggleArrow">▶</span> 3. Diário de Trading</h4>
-<div class="journalContent">
-<textarea id="assetDirection" placeholder="Ativo e Direção: Qual ativo foi operado e se foi compra ou venda."></textarea>
-<textarea id="entryReason" placeholder="Motivo da Entrada: Justificativa técnica."></textarea>
-<textarea id="tradePlan" placeholder="Preço de Entrada, Stop Loss e Alvo: O planejamento inicial da operação."></textarea>
-<textarea id="tradeResult" placeholder="Resultado: Gain ou Loss e valor financeiro."></textarea>
-<textarea id="mistakesMade" placeholder="Erros Cometidos: Anotações sobre desvios do plano."></textarea>
-</div></div>
+  <div class="agendaPanel" data-panel="3">
+    <div class="agendaPanelHeader">
+      <span class="agendaPanelTitle">Diário de Trading</span>
+      <span class="agendaPanelBadge badge-registro">Registro de Operações</span>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Ativo e Direção:</label>
+      <textarea id="assetDirection" placeholder="Qual ativo foi operado (ex: WIN, DOL, PETR4) e se foi compra ou venda."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Motivo da Entrada:</label>
+      <textarea id="entryReason" placeholder="Justificativa técnica (ex: rompimento de topo, cruzamento de médias móveis, suporte com padrão de candle)."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Preço de Entrada, Stop Loss e Alvo:</label>
+      <textarea id="tradePlan" placeholder="O planejamento inicial da operação."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Resultado:</label>
+      <textarea id="tradeResult" placeholder="Se foi gain (lucro) ou loss (prejuízo) e o valor financeiro."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Erros Cometidos:</label>
+      <textarea id="mistakesMade" placeholder="Anotações sobre desvios do plano (ex: entrada antecipada, não respeitou o stop)."></textarea>
+    </div>
+  </div>
 </div>
 <button id="save">Salvar</button>
 <button id="clearDay">Limpar dados</button>

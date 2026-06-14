@@ -1465,3 +1465,198 @@ width:100%;
 min-height:70px;
 margin-bottom:8px;
 }
+
+/* ===== AGENDA DO TRADER — NOVO LAYOUT DE ABAS ===== */
+.agendaTrader{
+ margin:12px 0 4px;
+ background:linear-gradient(160deg,#0d1528,#080d1a);
+ border:1px solid rgba(255,255,255,.10);
+ border-radius:16px;
+ overflow:hidden;
+}
+
+.agendaHeader{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:14px 16px 10px;
+ border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.agendaTitle{
+ font-size:17px;
+ font-weight:900;
+ color:#f8fbff;
+ letter-spacing:-.2px;
+}
+
+.agendaSubtitle{
+ font-size:12px;
+ font-weight:700;
+ color:var(--accent,#7dd3fc);
+ text-align:right;
+ max-width:130px;
+ line-height:1.3;
+}
+
+.agendaTabs{
+ display:flex;
+ flex-direction:column;
+ gap:6px;
+ padding:10px 12px;
+ border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.agendaTab{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ padding:11px 14px;
+ border-radius:10px;
+ background:rgba(255,255,255,.04);
+ border:1px solid rgba(255,255,255,.07) !important;
+ color:#b8c2df;
+ font-size:14px;
+ font-weight:700;
+ text-align:left;
+ cursor:pointer;
+ transition:background .18s,color .18s,box-shadow .18s;
+ width:100%;
+ box-shadow:none !important;
+ transform:none !important;
+ filter:none !important;
+}
+
+.agendaTab:hover{
+ background:rgba(255,255,255,.08);
+ color:#dce8ff;
+ transform:none !important;
+ box-shadow:none !important;
+}
+
+.agendaTab.active{
+ background:linear-gradient(90deg,#20f7a4,#0fbf7a) !important;
+ color:#061017 !important;
+ border-color:transparent !important;
+ box-shadow:0 4px 18px rgba(32,247,164,.28) !important;
+ font-weight:900;
+}
+
+.agendaTabNum{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ width:22px;
+ height:22px;
+ border-radius:6px;
+ background:rgba(255,255,255,.12);
+ font-size:13px;
+ font-weight:900;
+ flex-shrink:0;
+ color:inherit;
+ transition:background .18s;
+}
+
+.agendaTab.active .agendaTabNum{
+ background:rgba(6,16,23,.22);
+}
+
+.agendaPanel{
+ display:none;
+ flex-direction:column;
+ gap:0;
+ padding:14px 14px 10px;
+}
+
+.agendaPanel.active{
+ display:flex;
+}
+
+.agendaPanelHeader{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ margin-bottom:12px;
+ gap:8px;
+}
+
+.agendaPanelTitle{
+ font-size:16px;
+ font-weight:900;
+ color:#f8fbff;
+}
+
+.agendaPanelBadge{
+ font-size:11px;
+ font-weight:900;
+ padding:3px 9px;
+ border-radius:999px;
+ white-space:nowrap;
+ letter-spacing:.3px;
+}
+
+.badge-checklist{
+ color:#20f7a4;
+ background:rgba(32,247,164,.12);
+ border:1px solid rgba(32,247,164,.28);
+}
+
+.badge-plano{
+ color:#7dd3fc;
+ background:rgba(125,211,252,.12);
+ border:1px solid rgba(125,211,252,.28);
+}
+
+.badge-registro{
+ color:#c084fc;
+ background:rgba(192,132,252,.12);
+ border:1px solid rgba(192,132,252,.28);
+}
+
+.agendaField{
+ display:flex;
+ flex-direction:column;
+ gap:4px;
+ margin-bottom:10px;
+}
+
+.agendaField:last-child{
+ margin-bottom:0;
+}
+
+.agendaFieldLabel{
+ font-size:12px;
+ font-weight:900;
+ color:#dce8ff;
+ letter-spacing:.1px;
+}
+
+.agendaField textarea{
+ min-height:68px;
+ resize:vertical;
+ background:#070d1c;
+ color:#e8edf8;
+ border:1px solid rgba(255,255,255,.10);
+ border-radius:10px;
+ padding:10px 12px;
+ font-size:13px;
+ font-family:inherit;
+ line-height:1.45;
+ outline:none;
+ transition:border-color .15s,box-shadow .15s;
+ width:100%;
+}
+
+.agendaField textarea::placeholder{
+ color:rgba(255,255,255,.22);
+ font-size:12.5px;
+}
+
+.agendaField textarea:focus{
+ border-color:rgba(125,211,252,.44);
+ box-shadow:0 0 0 3px rgba(125,211,252,.10);
+}
+
+.agendaField textarea:focus::placeholder{
+ color:transparent;
+}
