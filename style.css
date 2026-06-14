@@ -1660,3 +1660,205 @@ margin-bottom:8px;
 .agendaField textarea:focus::placeholder{
  color:transparent;
 }
+
+/* ===== PAINEL IMPORTAR / EXPORTAR ===== */
+.importExportPanel{
+ margin-top:20px;
+ padding:24px;
+}
+
+.importExportHeader{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:16px;
+ margin-bottom:20px;
+ flex-wrap:wrap;
+}
+
+.importExportHeader h2{
+ margin:0 0 4px;
+ font-size:22px;
+ font-weight:900;
+}
+
+.importExportHeader span{
+ color:var(--muted,#9ba8c7);
+ font-size:13px;
+ font-weight:600;
+}
+
+.importExportBadge{
+ display:flex;
+ align-items:center;
+ gap:7px;
+ padding:5px 12px;
+ border-radius:999px;
+ background:rgba(32,247,164,.08);
+ border:1px solid rgba(32,247,164,.22);
+ color:#20f7a4;
+ font-size:12px;
+ font-weight:900;
+ white-space:nowrap;
+ letter-spacing:.3px;
+}
+
+.ieBadgeDot{
+ width:7px;
+ height:7px;
+ border-radius:50%;
+ background:#20f7a4;
+ box-shadow:0 0 6px rgba(32,247,164,.8);
+ animation:iePulse 2s ease-in-out infinite;
+}
+
+@keyframes iePulse{
+ 0%,100%{opacity:1;transform:scale(1)}
+ 50%{opacity:.5;transform:scale(.85)}
+}
+
+.importExportGrid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:14px;
+}
+
+.importExportCard{
+ display:flex;
+ align-items:center;
+ gap:16px;
+ padding:18px 20px;
+ border-radius:16px;
+ border:1px solid rgba(255,255,255,.09);
+ background:linear-gradient(150deg,rgba(255,255,255,.07),rgba(255,255,255,.03));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+ flex-wrap:wrap;
+}
+
+.ieCardIcon{
+ flex-shrink:0;
+ width:52px;
+ height:52px;
+ border-radius:14px;
+ background:linear-gradient(135deg,rgba(32,247,164,.22),rgba(15,185,120,.12));
+ border:1px solid rgba(32,247,164,.22);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:#20f7a4;
+}
+
+.ieCardIconImport{
+ background:linear-gradient(135deg,rgba(125,211,252,.22),rgba(46,141,180,.12));
+ border-color:rgba(125,211,252,.22);
+ color:#7dd3fc;
+}
+
+.ieCardText{
+ flex:1;
+ min-width:0;
+}
+
+.ieCardText strong{
+ display:block;
+ font-size:15px;
+ font-weight:900;
+ color:#f8fbff;
+ margin-bottom:4px;
+}
+
+.ieCardText p{
+ margin:0;
+ font-size:12.5px;
+ color:#9ba8c7;
+ font-weight:600;
+ line-height:1.4;
+}
+
+.ieCardText code{
+ background:rgba(255,255,255,.08);
+ border-radius:4px;
+ padding:1px 5px;
+ font-size:11.5px;
+ color:#20f7a4;
+ font-family:monospace;
+}
+
+.importCard .ieCardText code{
+ color:#7dd3fc;
+}
+
+.ieBtn{
+ flex-shrink:0;
+ display:inline-flex;
+ align-items:center;
+ gap:7px;
+ padding:11px 20px;
+ border-radius:12px;
+ font-size:14px;
+ font-weight:900;
+ cursor:pointer;
+ border:none;
+ transition:transform .18s,box-shadow .18s,filter .18s;
+}
+
+.ieBtnExport{
+ background:linear-gradient(180deg,#23f0a0,#0fb978);
+ color:#061017;
+ box-shadow:0 8px 24px rgba(32,247,164,.28);
+}
+
+.ieBtnExport:hover{
+ transform:translateY(-2px);
+ box-shadow:0 12px 32px rgba(32,247,164,.38);
+ filter:saturate(1.1);
+}
+
+.ieBtnImport{
+ background:linear-gradient(180deg,#7dd3fc,#2e8db4);
+ color:#03111c;
+ box-shadow:0 8px 24px rgba(125,211,252,.22);
+}
+
+.ieBtnImport:hover{
+ transform:translateY(-2px);
+ box-shadow:0 12px 32px rgba(125,211,252,.34);
+ filter:saturate(1.1);
+}
+
+.ieToast{
+ margin-top:14px;
+ padding:11px 16px;
+ border-radius:10px;
+ font-size:13px;
+ font-weight:800;
+ text-align:center;
+ transition:opacity .3s;
+}
+
+.ieToast.success{
+ background:rgba(32,247,164,.12);
+ border:1px solid rgba(32,247,164,.28);
+ color:#20f7a4;
+}
+
+.ieToast.error{
+ background:rgba(255,93,115,.12);
+ border:1px solid rgba(255,93,115,.28);
+ color:#ff5d73;
+}
+
+@media(max-width:680px){
+ .importExportGrid{
+  grid-template-columns:1fr;
+ }
+ .importExportCard{
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+ }
+ .ieBtn{
+  width:100%;
+  justify-content:center;
+ }
+}

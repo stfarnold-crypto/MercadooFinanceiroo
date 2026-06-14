@@ -192,5 +192,47 @@
 <canvas id="monthlyChart"></canvas>
 </div>
 </div>
+<div class="glass importExportPanel">
+  <div class="importExportHeader">
+    <div class="importExportInfo">
+      <h2>Backup de Dados</h2>
+      <span>Exporte seus dados para transferir para outro computador ou como cópia de segurança</span>
+    </div>
+    <div class="importExportBadge">
+      <span class="ieBadgeDot"></span>
+      localStorage
+    </div>
+  </div>
+  <div class="importExportGrid">
+    <div class="importExportCard exportCard">
+      <div class="ieCardIcon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="ieCardText">
+        <strong>Exportar Dados</strong>
+        <p>Baixa um arquivo <code>.json</code> com todos os seus registros de performance</p>
+      </div>
+      <button id="exportBtn" class="ieBtn ieBtnExport" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+    </div>
+    <div class="importExportCard importCard">
+      <div class="ieCardIcon ieCardIconImport">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="15"/></svg>
+      </div>
+      <div class="ieCardText">
+        <strong>Importar Dados</strong>
+        <p>Carrega um arquivo <code>.json</code> exportado anteriormente — os dados atuais serão substituídos</p>
+      </div>
+      <button id="importBtn" class="ieBtn ieBtnImport" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="15"/></svg>
+        Importar
+      </button>
+      <input id="importFileInput" type="file" accept=".json" style="display:none">
+    </div>
+  </div>
+  <div id="ieToast" class="ieToast hidden"></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="script.js"></script></body></html>

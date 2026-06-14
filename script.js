@@ -1095,3 +1095,133 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
   obs.observe(mo,{attributes:true});
 })();
+
+
+// ===== IMPORTAR / EXPORTAR DADOS =====
+(function(){
+  function showToast(msg, type){
+    var toast=document.getElementById('ieToast');
+    if(!toast) return;
+    toast.textContent=msg;
+    toast.className='ieToast '+type;
+    setTimeout(function(){ toast.className='ieToast hidden'; }, 3500);
+  }
+
+  function getDateStamp(){
+    var d=new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  // EXPORTAR
+  var exportBtn=document.getElementById('exportBtn');
+  if(exportBtn){
+    exportBtn.addEventListener('click', function(){
+      var data=localStorage.getItem('traderPro');
+      if(!data || data==='{}'){
+        showToast('⚠ Nenhum dado encontrado para exportar.','error');
+        return;
+      }
+      var blob=new Blob([data],{type:'application/json'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url;
+      a.download='trader-pro-backup-'+getDateStamp()+'.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('✅ Dados exportados com sucesso!','success');
+    });
+  }
+
+  // IMPORTAR
+  var importBtn=document.getElementById('importBtn');
+  var importFileInput=document.getElementById('importFileInput');
+
+  if(importBtn && importFileInput){
+    importBtn.addEventListener('click', function(){
+      importFileInput.value='';
+      importFileInput.click();
+    });
+
+    importFileInput.addEventListener('change', function(){
+      var file=importFileInput.files[0];
+      if(!file) return;
+      var reader=new FileReader();
+      reader.onload=function(e){
+        try{
+          var parsed=JSON.parse(e.target.result);
+          if(typeof parsed!=='object' || Array.isArray(parsed)){
+            showToast('❌ Arquivo inválido. Selecione um backup exportado pelo dashboard.','error');
+            return;
+          }
+          localStorage.setItem('traderPro', JSON.stringify(parsed));
+          showToast('✅ Dados importados com sucesso! Recarregando...','success');
+          setTimeout(function(){ location.reload(); }, 1800);
+        } catch(err){
+          showToast('❌ Erro ao ler o arquivo. Verifique se é um JSON válido.','error');
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+})();
+
+
+// ===== CORREÇÃO: campo ops controla quantidade exata de abas de operação =====
+(function(){
+  function waitForOps(){
+    var opsEl=document.getElementById('ops');
+    if(!opsEl){ setTimeout(waitForOps, 200); return; }
+
+    opsEl.addEventListener('input', function(){
+      var count=Math.max(0, Math.floor(Number(opsEl.value||0)));
+      var holder=document.getElementById('operationFields');
+      var resultEl=document.getElementById('result');
+      if(!holder) return;
+
+      // Captura valores existentes antes de recriar
+      var currentValues=Array.from(holder.querySelectorAll('.operationValue'))
+        .map(function(inp){ return inp.value; });
+
+      holder.innerHTML='';
+
+      if(count<2){
+        if(resultEl){ resultEl.readOnly=false; resultEl.classList.remove('calculatedResult'); }
+        return;
+      }
+
+      if(resultEl){ resultEl.readOnly=true; resultEl.classList.add('calculatedResult'); }
+
+      for(var i=0; i<count; i++){
+        var label=document.createElement('label');
+        label.className='operationField';
+        label.innerHTML='<span>Operação '+(i+1)+'</span><input class="operationValue" type="number" step="0.01" placeholder="Resultado R$">';
+        var inp=label.querySelector('input');
+        // Preserva valor se já existia, descarta se a aba foi removida
+        inp.value = (currentValues[i] !== undefined) ? currentValues[i] : '';
+        inp.addEventListener('input', function(){
+          var vals=Array.from(holder.querySelectorAll('.operationValue'))
+            .map(function(x){ return Number(x.value||0); });
+          if(resultEl && vals.length>=2){
+            resultEl.value=vals.reduce(function(a,b){return a+b;},0).toFixed(2);
+          }
+        });
+        holder.appendChild(label);
+      }
+
+      // Atualiza total imediatamente
+      var vals=Array.from(holder.querySelectorAll('.operationValue'))
+        .map(function(x){ return Number(x.value||0); });
+      if(resultEl && vals.length>=2){
+        resultEl.value=vals.reduce(function(a,b){return a+b;},0).toFixed(2);
+      }
+    }, true); // captura na fase de capture para sobrepor o handler original
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', waitForOps);
+  } else {
+    waitForOps();
+  }
+})();
