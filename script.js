@@ -1315,3 +1315,72 @@ document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(scaleCalendar, 100);
   setTimeout(scaleCalendar, 600);
 })();
+
+// ===== AGENDA DO TRADER — AUTO-SAVE EM TEMPO REAL =====
+(function(){
+  var journalFields=[
+    'economicCalendar','globalOverview',          // aba 1
+    'dailyStopLoss','profitGoal','maxTrades',      // aba 2
+    'assetDirection','entryReason','tradePlan','tradeResult','mistakesMade' // aba 3
+  ];
+
+  // Persiste os campos da agenda no localStorage imediatamente ao digitar
+  function autoSaveJournal(){
+    if(!selected) return; // modal não está aberto ainda
+    var d=db();
+    // Garante que o registro do dia existe antes de salvar a agenda
+    if(!d[selected]) d[selected]={};
+    journalFields.forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) d[selected][id]=el.value;
+    });
+    saveDb(d);
+  }
+
+  // Salva também quando o modal fecha (captura o que ainda não foi persistido)
+  function autoSaveOnClose(){
+    if(!selected) return;
+    var d=db();
+    if(!d[selected]) d[selected]={};
+    journalFields.forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) d[selected][id]=el.value;
+    });
+    saveDb(d);
+  }
+
+  // Aguarda DOM estar pronto para anexar listeners
+  function setupAutoSave(){
+    journalFields.forEach(function(id){
+      var el=document.getElementById(id);
+      if(!el) return;
+      // 'input' dispara em cada tecla; 'change' pega colar/autofill
+      el.addEventListener('input', autoSaveJournal);
+      el.addEventListener('change', autoSaveJournal);
+    });
+
+    // Salva ao fechar o modal pelos botões fechar/salvar/limpar
+    var closeBtn=document.getElementById('close');
+    var saveBtn=document.getElementById('save');
+    var clearBtn=document.getElementById('clearDay');
+    if(closeBtn) closeBtn.addEventListener('click', autoSaveOnClose);
+    if(saveBtn)  saveBtn.addEventListener('click',  autoSaveOnClose);
+    if(clearBtn) clearBtn.addEventListener('click',  function(){
+      // clearDay apaga o dia inteiro — não precisamos salvar a agenda
+    });
+
+    // Salva também ao clicar fora do modal (overlay)
+    var modalEl=document.getElementById('modal');
+    if(modalEl){
+      modalEl.addEventListener('click', function(e){
+        if(e.target===modalEl) autoSaveOnClose();
+      });
+    }
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', setupAutoSave);
+  } else {
+    setupAutoSave();
+  }
+})();
