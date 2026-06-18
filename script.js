@@ -62,9 +62,36 @@ function render(){
  totals();
 }
 
-function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=formatDateBR(k);result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';updateOperationFields(v.operationResults||[]);loadJournalFields(v);}
-save.onclick=()=>{let d=db();let operationResults=readOperationValues();let resultValue=operationResults.length>=2?sumOperationValues(operationResults):(+result.value||0);d[selected]={result:resultValue,points:+points.value||0,ops:+ops.value||0,dayType:dayType.value||'',operationResults:operationResults,...collectJournalFields()};saveDb(d);modal.classList.add('hidden');render();}
-clearDay.onclick=()=>{let d=db();delete d[selected];saveDb(d);result.value='';points.value='';ops.value='';dayType.value='';updateOperationFields([]);modal.classList.add('hidden');render();}
+function updateHolidayMarketRow(){
+  var row=document.getElementById('holidayMarketRow');
+  if(!row) return;
+  row.style.display=(dayType.value==='holiday')?'flex':'none';
+}
+function setHolidayMarket(val){
+  document.querySelectorAll('.holidayMarketBtn').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.market===val);
+  });
+}
+function getHolidayMarket(){
+  var active=document.querySelector('.holidayMarketBtn.active');
+  return active ? active.dataset.market : '';
+}
+(function(){
+  var row=document.getElementById('holidayMarketRow');
+  if(row){
+    document.querySelectorAll('.holidayMarketBtn').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();
+        setHolidayMarket(btn.dataset.market);
+      });
+    });
+  }
+  dayType.addEventListener('change', updateHolidayMarketRow);
+})();
+
+function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=formatDateBR(k);result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';updateOperationFields(v.operationResults||[]);loadJournalFields(v);updateHolidayMarketRow();setHolidayMarket(v.holidayMarket||'');}
+save.onclick=()=>{let d=db();let operationResults=readOperationValues();let resultValue=operationResults.length>=2?sumOperationValues(operationResults):(+result.value||0);d[selected]={result:resultValue,points:+points.value||0,ops:+ops.value||0,dayType:dayType.value||'',holidayMarket:getHolidayMarket(),operationResults:operationResults,...collectJournalFields()};saveDb(d);modal.classList.add('hidden');render();}
+clearDay.onclick=()=>{let d=db();delete d[selected];saveDb(d);result.value='';points.value='';ops.value='';dayType.value='';setHolidayMarket('');updateHolidayMarketRow();updateOperationFields([]);modal.classList.add('hidden');render();}
 close.onclick=()=>modal.classList.add('hidden');
 prev.onclick=()=>{month=(month+11)%12;render()}
 next.onclick=()=>{month=(month+1)%12;render()}
@@ -364,7 +391,13 @@ render = function(){
       if((v.result||0)<0)c.classList.add('negative');
       if(v.dayType==='holiday')c.classList.add('holiday');
       if(v.dayType==='notOperated')c.classList.add('not-operated');
-      c.innerHTML=`<div class=date>${day}</div>
+      let flagsHtml='';
+      if(v.dayType==='holiday' && v.holidayMarket){
+        if(v.holidayMarket==='BRL') flagsHtml='<div class="dayFlags"><img src="BRASIL.png" class="dayFlag" alt="BRL"></div>';
+        else if(v.holidayMarket==='EUA') flagsHtml='<div class="dayFlags"><img src="EUA.png" class="dayFlag" alt="EUA"></div>';
+        else if(v.holidayMarket==='BRL/EUA') flagsHtml='<div class="dayFlags"><img src="BRASIL.png" class="dayFlag" alt="BRL"><img src="EUA.png" class="dayFlag" alt="EUA"></div>';
+      }
+      c.innerHTML=`${flagsHtml}<div class=date>${day}</div>
       <div class=value>${formatCalendarResult(v.result,data,y)}</div>
       <div>${v.points?Number(v.points)+' pts':''}</div>
       <div>${v.ops?Number(v.ops)+' ops':''}</div>
