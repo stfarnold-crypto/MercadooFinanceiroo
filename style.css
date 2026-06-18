@@ -2122,7 +2122,7 @@ body.modal-open{
 .star2{ color:#f59e0b; }
 .star1{ color:#20f7a4; }
 
-/* Frame do iframe */
+/* Frame do iframe — altura definida via JS conforme escala */
 .econCalFrame{
   position:relative;
   width:100%;
@@ -2131,7 +2131,6 @@ body.modal-open{
   border:1px solid rgba(255,255,255,.08);
   overflow:hidden;
   box-shadow:inset 0 2px 12px rgba(0,0,0,.35);
-  min-height:500px;
 }
 
 .econCalFrame::before{
@@ -2147,11 +2146,17 @@ body.modal-open{
   z-index:0;
 }
 
+/* Wrapper escalável: mantém iframe em 650px e aplica transform via JS */
+.econCalScaleWrap{
+  width:650px;
+  transform-origin:top left;
+}
+
 #econCalIframe{
   position:relative;
   z-index:1;
-  width:100%;
-  min-height:500px;
+  width:650px;
+  height:500px;
   border:none;
   display:block;
 }
@@ -2226,22 +2231,13 @@ body.modal-open{
     padding:6px 12px;
     font-size:12px;
   }
-  #econCalIframe{
-    min-height:420px;
-  }
-  .econCalFrame{
-    min-height:420px;
-  }
   .econCalLegend{
     gap:12px;
   }
 }
 
 @media(max-width:420px){
-  #econCalIframe{
-    min-height:360px;
-  }
-  .econCalFrame{
-    min-height:360px;
+  .econCalPanel{
+    padding:12px;
   }
 }

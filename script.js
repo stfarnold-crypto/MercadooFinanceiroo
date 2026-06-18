@@ -1283,3 +1283,35 @@ document.addEventListener('DOMContentLoaded',()=>{
  }).observe(modalEl,{attributes:true});
 })();
 
+
+// ===== CALENDÁRIO ECONÔMICO — ESCALA RESPONSIVA =====
+(function(){
+  var IFRAME_W = 650;  // largura interna fixa do widget Investing.com
+  var IFRAME_H = 500;  // altura base do iframe
+
+  var frame    = document.querySelector('.econCalFrame');
+  var wrap     = document.querySelector('.econCalScaleWrap');
+  var iframe   = document.getElementById('econCalIframe');
+  if(!frame || !wrap || !iframe) return;
+
+  function scaleCalendar(){
+    var availW = frame.clientWidth;
+    if(availW <= 0) return;
+    var scale = availW >= IFRAME_W ? 1 : availW / IFRAME_W;
+    wrap.style.transform = 'scale(' + scale + ')';
+    // Ajusta a altura do container para não deixar espaço vazio
+    frame.style.height = Math.ceil(IFRAME_H * scale) + 'px';
+  }
+
+  // Executa ao carregar e ao redimensionar
+  window.addEventListener('resize', scaleCalendar);
+  // Aguarda DOM + fontes antes do primeiro cálculo
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', scaleCalendar);
+  } else {
+    scaleCalendar();
+  }
+  // Segurança: roda novamente após um tick para pegar dimensões corretas
+  setTimeout(scaleCalendar, 100);
+  setTimeout(scaleCalendar, 600);
+})();
