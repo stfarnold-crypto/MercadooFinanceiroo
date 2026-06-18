@@ -208,6 +208,38 @@
 <canvas id="monthlyChart"></canvas>
 </div>
 </div>
+<div class="glass econCalPanel">
+  <div class="econCalHeader">
+    <div class="econCalHeaderLeft">
+      <div class="econCalIcon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div>
+        <h2>Calendário Econômico</h2>
+        <span>Eventos de alto impacto em tempo real · Investing.com</span>
+      </div>
+    </div>
+    <div class="econCalBadge">
+      <span class="econCalBadgeDot"></span>
+      Tempo Real
+    </div>
+  </div>
+  <div class="econCalFrame">
+    <iframe
+      id="econCalIframe"
+      src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&features=datepicker,timezone,timeselector,filters&countries=17,25,32,6,37,5,22,39,10,35,7,4,12,72&calType=day&timeZone=12&lang=12"
+      frameborder="0"
+      allowtransparency="true"
+      marginwidth="0"
+      marginheight="0"
+      title="Calendário Econômico Investing.com"
+    ></iframe>
+  </div>
+  <div class="econCalFooter">
+    <span>Calendário Econômico fornecido por</span>
+    <a href="https://br.investing.com/" target="_blank" rel="nofollow">Investing.com Brasil</a>
+  </div>
+</div>
 <div class="glass importExportPanel">
   <div class="importExportHeader">
     <div class="importExportInfo">
