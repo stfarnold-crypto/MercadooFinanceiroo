@@ -189,7 +189,8 @@ function getOperationEntries(data,scope){
    if(operationsRangeStart && key<operationsRangeStart) return [];
    if(operationsRangeEnd && key>operationsRangeEnd) return [];
    const dayData=data[key]||{};
-   if(dayData.dayType==='holiday' || dayData.dayType==='notOperated') return [];
+   const hasOperationData = (Array.isArray(dayData.operationResults) && dayData.operationResults.length>0) || Number(dayData.ops||0)>0 || Number(dayData.result||0)!==0;
+   if((dayData.dayType==='holiday' || dayData.dayType==='notOperated') && !hasOperationData) return [];
    const saved=Array.isArray(dayData.operationResults) ? dayData.operationResults : [];
    const fallback=(Number(dayData.ops||0)>0 || Number(dayData.result||0)!==0) ? [Number(dayData.result||0)] : [];
    const values=saved.length ? saved : fallback;
