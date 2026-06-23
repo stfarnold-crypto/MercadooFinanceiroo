@@ -717,6 +717,10 @@ input:focus,select:focus{
  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }
 
+#equityChart{
+ background:#000000 !important;
+}
+
 #monthlyChart{
  height:540px !important;
  background:#202020 !important;
@@ -726,9 +730,9 @@ input:focus,select:focus{
 
 #equityChart{
  height:420px !important;
- background:
-  linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)),
-  linear-gradient(180deg,#171c1f,#101416) !important;
+ background:#000000 !important;
+ border:1px solid rgba(255,255,255,.07) !important;
+ box-shadow:0 0 32px rgba(0,0,0,.85) !important;
 }
 
 .operationFields{
