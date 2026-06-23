@@ -1,0 +1,726 @@
+/* ===================================================================
+   INSIGHTS PANEL — Trader Performance Dashboard Pro
+   Arquivo separado: não modifica style.css original
+   Responsividade completa: desktop → tablet → mobile → mobile-xs
+   =================================================================== */
+
+/* ---------- PAINEL PRINCIPAL ---------- */
+.insightsPanel {
+  margin-top: 20px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brilho decorativo de fundo */
+.insightsPanel::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(167,139,250,.13) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+/* ---------- HEADER ---------- */
+.insightsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.insightsHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.insightsIcon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(167,139,250,.28), rgba(139,92,246,.14));
+  border: 1px solid rgba(167,139,250,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a78bfa;
+  box-shadow: 0 0 18px rgba(167,139,250,.18);
+}
+
+.insightsHeaderLeft > div {
+  min-width: 0;
+}
+
+.insightsHeader h2 {
+  margin: 0 0 3px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #f8fbff;
+  white-space: nowrap;
+}
+
+.insightsHeader > .insightsHeaderLeft > div > span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9ba8c7;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.insightsActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Badge IA */
+.insightsAiBadge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(167,139,250,.1);
+  border: 1px solid rgba(167,139,250,.28);
+  color: #a78bfa;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+  letter-spacing: .4px;
+}
+
+.insightsAiDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a78bfa;
+  box-shadow: 0 0 6px rgba(167,139,250,.9);
+  animation: insightsPulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes insightsPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(167,139,250,.9); }
+  50%       { opacity: .5; box-shadow: 0 0 2px rgba(167,139,250,.3); }
+}
+
+/* Botão Gerar */
+.insightsGenerateBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 12px;
+  border: none !important;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .18s, box-shadow .18s, filter .18s;
+  box-shadow: 0 6px 22px rgba(124,58,237,.38);
+  width: auto !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.insightsGenerateBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(124,58,237,.52);
+  filter: brightness(1.07);
+}
+
+.insightsGenerateBtn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Botão Regenerar */
+.insightsRegenBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(167,139,250,.3) !important;
+  background: rgba(167,139,250,.08);
+  color: #a78bfa !important;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  width: auto !important;
+  white-space: nowrap;
+}
+
+.insightsRegenBtn:hover {
+  background: rgba(167,139,250,.18);
+  border-color: rgba(167,139,250,.55) !important;
+}
+
+/* ---------- ESTADO VAZIO ---------- */
+.insightsEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.insightsEmptyIcon {
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(167,139,250,.12), rgba(139,92,246,.06));
+  border: 1px solid rgba(167,139,250,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(167,139,250,.55);
+  flex-shrink: 0;
+}
+
+.insightsEmpty p {
+  max-width: 400px;
+  color: #9ba8c7;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.insightsEmpty strong {
+  color: #a78bfa;
+}
+
+/* ---------- LOADING ---------- */
+.insightsLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 52px 24px;
+}
+
+.insightsLoadingSpinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid rgba(167,139,250,.2);
+  border-top-color: #a78bfa;
+  animation: insightsSpin .8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes insightsSpin {
+  to { transform: rotate(360deg); }
+}
+
+.insightsLoading p {
+  color: #9ba8c7;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+  animation: insightsFade 1.6s ease-in-out infinite;
+}
+
+@keyframes insightsFade {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .45; }
+}
+
+/* ---------- BARRA DE RESUMO ---------- */
+.insightsSummaryBar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.insightsStat {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+  border: 1px solid rgba(255,255,255,.09);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.insightsStat::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 14px 14px 0 0;
+}
+
+.insightsStat.green::before  { background: linear-gradient(90deg, #20f7a4, transparent); }
+.insightsStat.red::before    { background: linear-gradient(90deg, #ff5d73, transparent); }
+.insightsStat.blue::before   { background: linear-gradient(90deg, #7dd3fc, transparent); }
+.insightsStat.purple::before { background: linear-gradient(90deg, #a78bfa, transparent); }
+.insightsStat.amber::before  { background: linear-gradient(90deg, #f59e0b, transparent); }
+
+.insightsStatLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9ba8c7;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.insightsStatValue {
+  font-size: clamp(14px, 1.4vw, 20px);
+  font-weight: 900;
+  color: #f8fbff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.insightsStatValue.green  { color: #20f7a4; text-shadow: 0 0 14px rgba(32,247,164,.3); }
+.insightsStatValue.red    { color: #ff5d73; text-shadow: 0 0 14px rgba(255,93,115,.3); }
+.insightsStatValue.blue   { color: #7dd3fc; }
+.insightsStatValue.purple { color: #a78bfa; }
+.insightsStatValue.amber  { color: #f59e0b; }
+
+/* ---------- GRID DE CARDS ---------- */
+.insightsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+/* Card individual */
+.insightCard {
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .18s, box-shadow .18s;
+}
+
+.insightCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(0,0,0,.3);
+}
+
+/* Faixa de cor lateral por tipo */
+.insightCard::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: 16px 0 0 16px;
+}
+
+.insightCard.type-error::before    { background: #ff5d73; box-shadow: 2px 0 10px rgba(255,93,115,.4); }
+.insightCard.type-positive::before { background: #20f7a4; box-shadow: 2px 0 10px rgba(32,247,164,.4); }
+.insightCard.type-warning::before  { background: #f59e0b; box-shadow: 2px 0 10px rgba(245,158,11,.4); }
+.insightCard.type-tip::before      { background: #7dd3fc; box-shadow: 2px 0 10px rgba(125,211,252,.4); }
+.insightCard.type-pattern::before  { background: #a78bfa; box-shadow: 2px 0 10px rgba(167,139,250,.4); }
+
+/* Ícone + Título do card */
+.insightCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.insightCardIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.insightCard.type-error    .insightCardIcon { background: rgba(255,93,115,.15);  color: #ff5d73; border: 1px solid rgba(255,93,115,.25); }
+.insightCard.type-positive .insightCardIcon { background: rgba(32,247,164,.12);  color: #20f7a4; border: 1px solid rgba(32,247,164,.22); }
+.insightCard.type-warning  .insightCardIcon { background: rgba(245,158,11,.12);  color: #f59e0b; border: 1px solid rgba(245,158,11,.22); }
+.insightCard.type-tip      .insightCardIcon { background: rgba(125,211,252,.12); color: #7dd3fc; border: 1px solid rgba(125,211,252,.22); }
+.insightCard.type-pattern  .insightCardIcon { background: rgba(167,139,250,.12); color: #a78bfa; border: 1px solid rgba(167,139,250,.22); }
+
+.insightCardTitle {
+  font-size: 13px;
+  font-weight: 900;
+  color: #f8fbff;
+  line-height: 1.3;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.insightCardBadge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  letter-spacing: .3px;
+  flex-shrink: 0;
+}
+
+.insightCard.type-error    .insightCardBadge { background: rgba(255,93,115,.15);  color: #ff5d73;  border: 1px solid rgba(255,93,115,.25);  }
+.insightCard.type-positive .insightCardBadge { background: rgba(32,247,164,.12);  color: #20f7a4;  border: 1px solid rgba(32,247,164,.22);  }
+.insightCard.type-warning  .insightCardBadge { background: rgba(245,158,11,.12);  color: #f59e0b;  border: 1px solid rgba(245,158,11,.22);  }
+.insightCard.type-tip      .insightCardBadge { background: rgba(125,211,252,.12); color: #7dd3fc;  border: 1px solid rgba(125,211,252,.22); }
+.insightCard.type-pattern  .insightCardBadge { background: rgba(167,139,250,.12); color: #a78bfa;  border: 1px solid rgba(167,139,250,.22); }
+
+/* Texto do card */
+.insightCardText {
+  font-size: 13.5px;
+  color: #c8d4f0;
+  line-height: 1.6;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* Separador */
+.insightCardDivider {
+  height: 1px;
+  background: rgba(255,255,255,.07);
+  margin: 2px 0;
+}
+
+/* Ação do card */
+.insightCardAction {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9ba8c7;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  word-break: break-word;
+}
+
+.insightCardAction::before {
+  content: "→";
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ---------- RODAPÉ ---------- */
+.insightsFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  flex-wrap: wrap;
+}
+
+#insightsGeneratedAt {
+  font-size: 11px;
+  color: rgba(155,168,199,.55);
+  font-weight: 600;
+}
+
+/* =====================================================
+   RESPONSIVIDADE — alinhada com os breakpoints do
+   dashboard original (1200 / 900 / 600 / 420)
+   ===================================================== */
+
+/* ---------- Tablet largo (≤ 1200px) ---------- */
+@media (max-width: 1200px) {
+  .insightsSummaryBar {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .insightsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .insightsStatValue {
+    font-size: 17px;
+  }
+}
+
+/* ---------- Tablet / paisagem mobile (≤ 900px) ---------- */
+@media (max-width: 900px) {
+  .insightsPanel {
+    padding: 20px;
+  }
+
+  .insightsHeader {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .insightsHeaderLeft {
+    width: 100%;
+  }
+
+  .insightsActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .insightsGenerateBtn {
+    flex: 1 1 auto;
+  }
+
+  .insightsSummaryBar {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .insightsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .insightsStatValue {
+    font-size: 16px;
+  }
+}
+
+/* ---------- Mobile (≤ 600px) ---------- */
+@media (max-width: 600px) {
+  .insightsPanel {
+    padding: 16px;
+    margin-top: 12px;
+  }
+
+  /* Remove brilho decorativo que pode vazar */
+  .insightsPanel::before {
+    display: none;
+  }
+
+  .insightsHeader {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .insightsIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .insightsHeader h2 {
+    font-size: 18px;
+  }
+
+  /* Badge IA: esconder em telas muito pequenas */
+  .insightsAiBadge {
+    display: none;
+  }
+
+  /* Botão Gerar: largura total */
+  .insightsGenerateBtn {
+    width: 100% !important;
+    padding: 13px 16px;
+    font-size: 14px;
+    justify-content: center;
+  }
+
+  /* Barra de resumo: 2 colunas */
+  .insightsSummaryBar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .insightsStat {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .insightsStatLabel {
+    font-size: 9px;
+  }
+
+  .insightsStatValue {
+    font-size: 15px;
+  }
+
+  /* Cards: coluna única */
+  .insightsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .insightCard {
+    padding: 16px 16px 16px 20px;
+    border-radius: 14px;
+    gap: 8px;
+  }
+
+  .insightCardTop {
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .insightCardIcon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  .insightCardTitle {
+    font-size: 13px;
+  }
+
+  .insightCardBadge {
+    font-size: 9px;
+    padding: 2px 8px;
+  }
+
+  .insightCardText {
+    font-size: 13px;
+  }
+
+  .insightCardAction {
+    font-size: 11.5px;
+  }
+
+  /* Estado vazio */
+  .insightsEmpty {
+    padding: 36px 16px;
+    gap: 14px;
+  }
+
+  .insightsEmptyIcon {
+    width: 68px;
+    height: 68px;
+  }
+
+  .insightsEmpty p {
+    font-size: 13px;
+  }
+
+  /* Loading */
+  .insightsLoading {
+    padding: 40px 16px;
+  }
+
+  /* Rodapé */
+  .insightsFooter {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .insightsRegenBtn {
+    width: 100% !important;
+    padding: 10px 16px;
+    justify-content: center;
+    font-size: 13px;
+  }
+}
+
+/* ---------- Mobile XS (≤ 420px) ---------- */
+@media (max-width: 420px) {
+  .insightsPanel {
+    padding: 12px;
+  }
+
+  .insightsHeader h2 {
+    font-size: 16px;
+  }
+
+  .insightsIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Barra de resumo: ainda 2 colunas mas compacta */
+  .insightsSummaryBar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .insightsStat {
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .insightsStatLabel {
+    font-size: 8px;
+  }
+
+  .insightsStatValue {
+    font-size: 13px;
+  }
+
+  .insightsGrid {
+    gap: 8px;
+  }
+
+  .insightCard {
+    padding: 14px 14px 14px 18px;
+    border-radius: 12px;
+  }
+
+  .insightCardTitle {
+    font-size: 12px;
+  }
+
+  .insightCardText {
+    font-size: 12px;
+  }
+
+  .insightCardAction {
+    font-size: 11px;
+  }
+
+  .insightsEmpty {
+    padding: 28px 12px;
+  }
+
+  .insightsEmptyIcon {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+  }
+
+  .insightsLoading {
+    padding: 32px 12px;
+  }
+
+  .insightsLoadingSpinner {
+    width: 36px;
+    height: 36px;
+  }
+}
