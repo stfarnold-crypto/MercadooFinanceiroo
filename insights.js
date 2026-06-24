@@ -65,19 +65,43 @@
     return days;
   }
 
-  /* ---- Estatísticas do mês ---- */
+  /* ---- Estatísticas do mês ----
+     Taxa de acerto espelha o grafico de Pizza da aba Operacoes:
+     expande cada dia em suas operacoes individuais (operationResults),
+     classifica cada operacao como vencedora (>0), perdedora (<0) ou empatada (=0).
+  ---- */
   function calcStats(days) {
-    var traded = days.filter(function (d) { return d.dayType !== 'holiday' && d.dayType !== 'notOperated' && d.result !== 0; });
+    // Dias operados: exclui feriados e nao operados (inclui resultado zero)
+    var traded = days.filter(function (d) { return d.dayType !== 'holiday' && d.dayType !== 'notOperated'; });
+
+    // Totais financeiros por dia
     var wins   = traded.filter(function (d) { return d.result > 0; });
     var losses = traded.filter(function (d) { return d.result < 0; });
-    var totalResult  = traded.reduce(function (a, d) { return a + d.result; }, 0);
-    var grossProfit  = wins.reduce(function (a, d) { return a + d.result; }, 0);
-    var grossLoss    = losses.reduce(function (a, d) { return a + d.result; }, 0);
-    var winRate      = traded.length ? (wins.length / traded.length) * 100 : 0;
-    var totalOps     = traded.reduce(function (a, d) { return a + d.ops; }, 0);
-    var avgWin       = wins.length   ? grossProfit / wins.length   : 0;
-    var avgLoss      = losses.length ? grossLoss   / losses.length : 0;
-    var riskReward   = avgLoss !== 0 ? Math.abs(avgWin / avgLoss) : 0;
+    var totalResult = traded.reduce(function (a, d) { return a + d.result; }, 0);
+    var grossProfit = wins.reduce(function (a, d) { return a + d.result; }, 0);
+    var grossLoss   = losses.reduce(function (a, d) { return a + d.result; }, 0);
+    var totalOps    = traded.reduce(function (a, d) { return a + d.ops; }, 0);
+    var avgWin      = wins.length   ? grossProfit / wins.length   : 0;
+    var avgLoss     = losses.length ? grossLoss   / losses.length : 0;
+    var riskReward  = avgLoss !== 0 ? Math.abs(avgWin / avgLoss) : 0;
+
+    // Taxa de acerto: mesma logica do getOperationEntries + getEfficiencySlices do script.js
+    // expande operationResults individuais; se nao houver, usa resultado do dia como 1 operacao
+    var allOpValues = [];
+    traded.forEach(function (d) {
+      var hasOpData = (d.operationResults && d.operationResults.length > 0) || d.ops > 0 || d.result !== 0;
+      if (!hasOpData) return;
+      var saved = Array.isArray(d.operationResults) ? d.operationResults : [];
+      if (saved.length > 0) {
+        saved.forEach(function (v) { allOpValues.push(Number(v || 0)); });
+      } else if (d.ops > 0 || d.result !== 0) {
+        allOpValues.push(Number(d.result || 0));
+      }
+    });
+
+    var opWins  = allOpValues.filter(function (v) { return v > 0; }).length;
+    var winRate = allOpValues.length ? (opWins / allOpValues.length) * 100 : 0;
+
     return {
       tradedDays: traded.length,
       winDays:    wins.length,
@@ -236,32 +260,21 @@
     if (el) el.innerText = 'Análise inteligente do seu Diário de Trading — ' + monthName + '/' + year;
   }
 
-  /* ---- Mostra/oculta seções ---- */
+  /* ---- Mostra/oculta seções (loading sempre oculto) ---- */
   function showSection(id) {
+    // Se tentar mostrar loading, mantém o estado atual (empty ou content)
+    var show = id === 'insightsLoading' ? null : id;
     ['insightsEmpty','insightsLoading','insightsContent'].forEach(function (s) {
       var el = document.getElementById(s);
       if (!el) return;
-      el.classList.toggle('hidden', s !== id);
+      if (s === 'insightsLoading') { el.classList.add('hidden'); return; }
+      el.classList.toggle('hidden', s !== show);
     });
   }
 
-  /* ---- Mensagens de loading animadas ---- */
-  var LOADING_MSGS = [
-    'Lendo seu diário de trading...',
-    'Identificando padrões de comportamento...',
-    'Analisando erros e acertos do mês...',
-    'Calculando estatísticas de risco...',
-    'Gerando recomendações personalizadas...'
-  ];
+  /* ---- Mensagem de loading (desativada — só botão manual) ---- */
   function animateLoadingText() {
-    var el = document.getElementById('insightsLoadingText');
-    if (!el) return;
-    var i = 0;
-    el.innerText = LOADING_MSGS[0];
-    return setInterval(function () {
-      i = (i + 1) % LOADING_MSGS.length;
-      el.innerText = LOADING_MSGS[i];
-    }, 1400);
+    return null;
   }
 
   /* ---- Função principal de geração ---- */

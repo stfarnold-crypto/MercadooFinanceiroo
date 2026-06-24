@@ -2345,3 +2345,9 @@ body.modal-open{
     padding:12px;
   }
 }
+
+/* ===== Dia com resultado zerado (R$ 0,00) — contorno amarelo neon ===== */
+.day.zero-result {
+  border: 2.5px solid #ffe600;
+  box-shadow: 0 0 8px 2px #ffe60099, 0 0 18px 4px #ffe60044;
+}

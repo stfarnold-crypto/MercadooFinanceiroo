@@ -391,8 +391,13 @@ render = function(){
       c.innerHTML=`<div class=date>${day}</div><div>Mercado<br>Fechado</div>`;
    }else{
       c.className='day';
-      if((v.result||0)>0)c.classList.add('positive');
-      if((v.result||0)<0)c.classList.add('negative');
+      // Verifica se o dia tem dados registrados (result explicitamente definido)
+      const hasData = key in data;
+      const resultVal = Number(v.result||0);
+      if(resultVal>0)c.classList.add('positive');
+      if(resultVal<0)c.classList.add('negative');
+      // Dia com resultado exatamente zero mas que foi registrado: contorno amarelo neon
+      if(hasData && resultVal===0 && v.dayType!=='holiday' && v.dayType!=='notOperated')c.classList.add('zero-result');
       if(v.dayType==='holiday')c.classList.add('holiday');
       if(v.dayType==='notOperated')c.classList.add('not-operated');
       let flagsHtml='';
@@ -401,8 +406,12 @@ render = function(){
         else if(v.holidayMarket==='EUA') flagsHtml='<div class="dayFlags"><img src="EUA.png" class="dayFlag" alt="EUA"></div>';
         else if(v.holidayMarket==='BRL/EUA') flagsHtml='<div class="dayFlags"><img src="BRASIL.png" class="dayFlag" alt="BRL"><img src="EUA.png" class="dayFlag" alt="EUA"></div>';
       }
+      // Exibe R$ 0,00 quando o dia tem dados registrados com resultado zero
+      const displayResult = (hasData && resultVal===0 && v.dayType!=='holiday' && v.dayType!=='notOperated')
+        ? formatBRL(0)
+        : formatCalendarResult(v.result,data,y);
       c.innerHTML=`${flagsHtml}<div class=date>${day}</div>
-      <div class=value>${formatCalendarResult(v.result,data,y)}</div>
+      <div class=value>${displayResult}</div>
       <div>${v.points?Number(v.points)+' pts':''}</div>
       <div>${v.ops?Number(v.ops)+' ops':''}</div>
       <div>${v.dayType==='holiday'?'Feriado':v.dayType==='notOperated'?'Dia não Operado':''}</div>`;
