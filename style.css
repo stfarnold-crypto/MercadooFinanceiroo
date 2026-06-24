@@ -1,4 +1,77 @@
 
+/* ===== MODAL DE CONFIRMAÇÃO — LIMPAR DADOS ===== */
+.confirmBox{
+  width:360px;
+  background:#10182d;
+  padding:28px 24px 22px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 20px 60px rgba(0,0,0,.55);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  animation:confirmFadeIn .18s ease;
+}
+@keyframes confirmFadeIn{
+  from{opacity:0;transform:scale(.93) translateY(8px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+.confirmIcon{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  background:rgba(255,90,110,.12);
+  border:2px solid rgba(255,90,110,.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#ff5a6e;
+}
+.confirmTitle{
+  margin:0;
+  font-size:1.15rem;
+  font-weight:700;
+  color:#fff;
+  text-align:center;
+}
+.confirmMsg{
+  margin:0;
+  font-size:.88rem;
+  color:#9aa4c7;
+  text-align:center;
+  line-height:1.55;
+}
+.confirmActions{
+  display:flex;
+  gap:12px;
+  width:100%;
+  margin-top:4px;
+}
+.confirmBtn{
+  flex:1;
+  padding:11px;
+  border-radius:12px;
+  font-size:.95rem;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+  transition:filter .15s, transform .12s;
+}
+.confirmBtn:hover{filter:brightness(1.12);transform:translateY(-1px);}
+.confirmBtn:active{transform:translateY(0);}
+.confirmBtnNo{
+  background:rgba(255,255,255,.07);
+  color:#c8d0e8;
+  border:1px solid rgba(255,255,255,.12);
+}
+.confirmBtnNo:hover{background:rgba(255,255,255,.12);}
+.confirmBtnYes{
+  background:linear-gradient(135deg,#ff5a6e,#c9374a);
+  color:#fff;
+  box-shadow:0 4px 16px rgba(255,90,110,.3);
+}
+
 :root{--bg:#050816;--card:#0c1224;--green:#00ff9d;--red:#ff5a6e}
 *{box-sizing:border-box}body{margin:0;padding:20px;background:radial-gradient(circle at top,#101a3d,#050816);font-family:Segoe UI,sans-serif;color:#fff}
 .glass{background:rgba(255,255,255,.05);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 40px rgba(0,0,0,.35);border-radius:22px}
@@ -717,10 +790,6 @@ input:focus,select:focus{
  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }
 
-#equityChart{
- background:#000000 !important;
-}
-
 #monthlyChart{
  height:540px !important;
  background:#202020 !important;
@@ -730,9 +799,9 @@ input:focus,select:focus{
 
 #equityChart{
  height:420px !important;
- background:#000000 !important;
- border:1px solid rgba(255,255,255,.07) !important;
- box-shadow:0 0 32px rgba(0,0,0,.85) !important;
+ background:
+  linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)),
+  linear-gradient(180deg,#171c1f,#101416) !important;
 }
 
 .operationFields{

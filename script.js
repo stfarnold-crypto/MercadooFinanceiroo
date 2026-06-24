@@ -91,7 +91,10 @@ function getHolidayMarket(){
 
 function openModal(k,v){selected=k;modal.classList.remove('hidden');dateTitle.innerText=formatDateBR(k);result.value=v.result||'';points.value=v.points||'';ops.value=v.ops||'';dayType.value=v.dayType||'';updateOperationFields(v.operationResults||[]);loadJournalFields(v);updateHolidayMarketRow();setHolidayMarket(v.holidayMarket||'');}
 save.onclick=()=>{let d=db();let operationResults=readOperationValues();let resultValue=operationResults.length>=2?sumOperationValues(operationResults):(+result.value||0);d[selected]={result:resultValue,points:+points.value||0,ops:+ops.value||0,dayType:dayType.value||'',holidayMarket:getHolidayMarket(),operationResults:operationResults,...collectJournalFields()};saveDb(d);modal.classList.add('hidden');render();}
-clearDay.onclick=()=>{let d=db();delete d[selected];saveDb(d);result.value='';points.value='';ops.value='';dayType.value='';setHolidayMarket('');updateHolidayMarketRow();updateOperationFields([]);modal.classList.add('hidden');render();}
+function executeClearDay(){let d=db();delete d[selected];saveDb(d);result.value='';points.value='';ops.value='';dayType.value='';setHolidayMarket('');updateHolidayMarketRow();updateOperationFields([]);modal.classList.add('hidden');render();}
+clearDay.onclick=()=>{document.getElementById('confirmClearModal').classList.remove('hidden');}
+document.getElementById('confirmClearYes').onclick=()=>{document.getElementById('confirmClearModal').classList.add('hidden');executeClearDay();}
+document.getElementById('confirmClearNo').onclick=()=>{document.getElementById('confirmClearModal').classList.add('hidden');}
 close.onclick=()=>modal.classList.add('hidden');
 prev.onclick=()=>{month=(month+11)%12;render()}
 next.onclick=()=>{month=(month+1)%12;render()}
@@ -549,32 +552,18 @@ function drawCharts(){
    const chartGradient=ctx=>{
      const chart=ctx.chart;
      const area=chart.chartArea;
-     if(!area) return isPositiveCurve ? 'rgba(0,200,100,.35)' : 'rgba(220,30,50,.35)';
+     if(!area) return isPositiveCurve ? 'rgba(32,247,164,.24)' : 'rgba(255,93,115,.24)';
      const g=chart.ctx.createLinearGradient(0,area.top,0,area.bottom);
      if(isPositiveCurve){
-       g.addColorStop(0,'rgba(0,230,110,.55)');
-       g.addColorStop(0.38,'rgba(0,160,70,.28)');
-       g.addColorStop(0.72,'rgba(0,60,25,.10)');
-       g.addColorStop(1,'rgba(0,0,0,0)');
+       g.addColorStop(0,'rgba(32,247,164,.5)');
+       g.addColorStop(.5,'rgba(32,247,164,.2)');
+       g.addColorStop(1,'rgba(0,0,0,.14)');
      }else{
-       g.addColorStop(0,'rgba(230,30,50,.65)');
-       g.addColorStop(0.35,'rgba(180,20,35,.32)');
-       g.addColorStop(0.68,'rgba(80,5,10,.12)');
-       g.addColorStop(1,'rgba(0,0,0,0)');
+       g.addColorStop(0,'rgba(255,93,115,.5)');
+       g.addColorStop(.5,'rgba(255,93,115,.2)');
+       g.addColorStop(1,'rgba(0,0,0,.14)');
      }
      return g;
-   };
-   const equityBlackBgPlugin={
-     id:'equityBlackBgPlugin',
-     beforeDraw(chart){
-       const ctx=chart.ctx;
-       const area=chart.chartArea;
-       if(!area) return;
-       ctx.save();
-       ctx.fillStyle='#000000';
-       ctx.fillRect(area.left,area.top,area.right-area.left,area.bottom-area.top);
-       ctx.restore();
-     }
    };
    equityChartInstance=new Chart(ectx,{
       type:'line',
@@ -585,35 +574,17 @@ function drawCharts(){
           data:equity,
           tension:.28,
           fill:'origin',
-          borderWidth:2.5,
-          borderColor:isPositiveCurve ? '#00e86e' : '#ff2038',
+          borderWidth:3,
+          borderColor:isPositiveCurve ? '#20f7a4' : '#ff5d73',
           backgroundColor:chartGradient,
           pointRadius:0,
           pointHoverRadius:7,
-          pointHoverBackgroundColor:isPositiveCurve ? '#00e86e' : '#ff2038',
+          pointHoverBackgroundColor:isPositiveCurve ? '#20f7a4' : '#ff5d73',
           pointHoverBorderColor:'#ffffff',
           pointHoverBorderWidth:3,
           segment:{
-            borderColor:ctx=>ctx.p1.parsed.y>=0 ? '#00e86e' : '#ff2038',
-            backgroundColor:ctx=>{
-              const chart=ctx.chart;
-              const area=chart.chartArea;
-              if(!area) return ctx.p1.parsed.y>=0 ? 'rgba(0,230,110,.35)' : 'rgba(230,30,50,.35)';
-              const pos=ctx.p1.parsed.y>=0;
-              const g=chart.ctx.createLinearGradient(0,area.top,0,area.bottom);
-              if(pos){
-                g.addColorStop(0,'rgba(0,230,110,.55)');
-                g.addColorStop(0.38,'rgba(0,160,70,.28)');
-                g.addColorStop(0.72,'rgba(0,60,25,.10)');
-                g.addColorStop(1,'rgba(0,0,0,0)');
-              }else{
-                g.addColorStop(0,'rgba(230,30,50,.65)');
-                g.addColorStop(0.35,'rgba(180,20,35,.32)');
-                g.addColorStop(0.68,'rgba(80,5,10,.12)');
-                g.addColorStop(1,'rgba(0,0,0,0)');
-              }
-              return g;
-            }
+            borderColor:ctx=>ctx.p1.parsed.y>=0 ? '#20f7a4' : '#ff5d73',
+            backgroundColor:ctx=>ctx.p1.parsed.y>=0 ? 'rgba(32,247,164,.24)' : 'rgba(255,93,115,.24)'
           }
         }]
       },
@@ -634,12 +605,12 @@ function drawCharts(){
           y:{
             beginAtZero:false,
             ticks:{color:'rgba(255,255,255,.52)',callback:value=>formatBRL(value)},
-            grid:{color:'rgba(255,255,255,.04)'},
+            grid:{color:'rgba(255,255,255,.055)'},
             border:{display:false}
           }
         }
       },
-      plugins:[equityBlackBgPlugin,zeroLinePlugin]
+      plugins:[zeroLinePlugin]
    });
  }
 
