@@ -502,6 +502,7 @@ function drawCharts(){
  });
 
  const isPositiveCurve=(equity.length===0 || equity[equity.length-1] >= 0);
+
  const externalEquityTooltip=context=>{
    const {chart,tooltip}=context;
    let tooltipEl=document.getElementById('equityTooltip');
@@ -533,14 +534,15 @@ function drawCharts(){
    tooltipEl.style.left=rect.left+window.pageXOffset+tooltip.caretX+'px';
    tooltipEl.style.top=rect.top+window.pageYOffset+tooltip.caretY+'px';
  };
+ // Plugin: linha zero branca
  const zeroLinePlugin={
    id:'zeroLinePlugin',
    afterDraw(chart){
      const yScale=chart.scales.y;
      const area=chart.chartArea;
-     if(!yScale || !area) return;
+     if(!yScale||!area) return;
      const zeroY=yScale.getPixelForValue(0);
-     if(zeroY<area.top || zeroY>area.bottom) return;
+     if(zeroY<area.top||zeroY>area.bottom) return;
      const ctx=chart.ctx;
      ctx.save();
      ctx.beginPath();
@@ -555,71 +557,147 @@ function drawCharts(){
    }
  };
 
+ // Plugin: clipa cada dataset na sua zona (acima/abaixo de zero)
+ // idx 0 = fill verde  → acima de zero
+ // idx 1 = fill vermelho → abaixo de zero
+ // idx 2 = linha verde   → acima de zero
+ // idx 3 = linha vermelha → abaixo de zero
+ const splitClipPlugin={
+   id:'splitClipPlugin',
+   beforeDatasetDraw(chart,args){
+     const yScale=chart.scales.y;
+     const area=chart.chartArea;
+     if(!yScale||!area) return;
+     const zeroY=Math.min(Math.max(yScale.getPixelForValue(0),area.top),area.bottom);
+     const ctx=chart.ctx;
+     const idx=args.index;
+     ctx.save();
+     ctx.beginPath();
+     if(idx===0||idx===2){
+       // fill verde e linha verde → acima de zero
+       ctx.rect(area.left,area.top,area.right-area.left,zeroY-area.top);
+     } else {
+       // fill vermelho e linha vermelha → abaixo de zero
+       ctx.rect(area.left,zeroY,area.right-area.left,area.bottom-zeroY);
+     }
+     ctx.clip();
+   },
+   afterDatasetDraw(chart,args){
+     chart.ctx.restore();
+   }
+ };
+
  const ectx=document.getElementById('equityChart');
  if(ectx){
    if(equityChartInstance) equityChartInstance.destroy();
-   const chartGradient=ctx=>{
+
+   const greenFill=ctx=>{
      const chart=ctx.chart;
      const area=chart.chartArea;
-     if(!area) return isPositiveCurve ? 'rgba(32,247,164,.24)' : 'rgba(255,93,115,.24)';
-     const g=chart.ctx.createLinearGradient(0,area.top,0,area.bottom);
-     if(isPositiveCurve){
-       g.addColorStop(0,'rgba(32,247,164,.5)');
-       g.addColorStop(.5,'rgba(32,247,164,.2)');
-       g.addColorStop(1,'rgba(0,0,0,.14)');
-     }else{
-       g.addColorStop(0,'rgba(255,93,115,.5)');
-       g.addColorStop(.5,'rgba(255,93,115,.2)');
-       g.addColorStop(1,'rgba(0,0,0,.14)');
-     }
+     const yScale=chart.scales.y;
+     if(!area||!yScale) return 'rgba(32,247,164,.3)';
+     const zeroY=Math.min(Math.max(yScale.getPixelForValue(0),area.top),area.bottom);
+     const g=chart.ctx.createLinearGradient(0,area.top,0,zeroY);
+     g.addColorStop(0,'rgba(32,247,164,.55)');
+     g.addColorStop(.6,'rgba(32,247,164,.22)');
+     g.addColorStop(1,'rgba(32,247,164,.04)');
      return g;
    };
+   const redFill=ctx=>{
+     const chart=ctx.chart;
+     const area=chart.chartArea;
+     const yScale=chart.scales.y;
+     if(!area||!yScale) return 'rgba(255,93,115,.3)';
+     const zeroY=Math.min(Math.max(yScale.getPixelForValue(0),area.top),area.bottom);
+     const g=chart.ctx.createLinearGradient(0,zeroY,0,area.bottom);
+     g.addColorStop(0,'rgba(255,93,115,.04)');
+     g.addColorStop(.5,'rgba(255,93,115,.25)');
+     g.addColorStop(1,'rgba(255,93,115,.55)');
+     return g;
+   };
+
+   const commonLineProps={
+     tension:.28,
+     fill:false,
+     borderWidth:3,
+     pointRadius:0,
+     pointHoverRadius:7,
+     pointHoverBorderColor:'#ffffff',
+     pointHoverBorderWidth:3,
+     order:1
+   };
+
    equityChartInstance=new Chart(ectx,{
-      type:'line',
-      data:{
-        labels,
-        datasets:[{
-          label:'Capital Acumulado',
-          data:equity,
-          tension:.28,
-          fill:'origin',
-          borderWidth:3,
-          borderColor:isPositiveCurve ? '#20f7a4' : '#ff5d73',
-          backgroundColor:chartGradient,
-          pointRadius:0,
-          pointHoverRadius:7,
-          pointHoverBackgroundColor:isPositiveCurve ? '#20f7a4' : '#ff5d73',
-          pointHoverBorderColor:'#ffffff',
-          pointHoverBorderWidth:3,
-          segment:{
-            borderColor:ctx=>ctx.p1.parsed.y>=0 ? '#20f7a4' : '#ff5d73',
-            backgroundColor:ctx=>ctx.p1.parsed.y>=0 ? 'rgba(32,247,164,.24)' : 'rgba(255,93,115,.24)'
-          }
-        }]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        interaction:{intersect:false,mode:'index'},
-        plugins:{
-          legend:{display:false},
-          title:{display:true,text:'Patrimônio',color:'#ffffff',font:{size:16,weight:'700'}},
-          tooltip:{
-            enabled:false,
-            external:externalEquityTooltip
-          }
-        },
-        scales:{
-          x:{ticks:{display:false},grid:{display:false},border:{display:false}},
-          y:{
-            beginAtZero:false,
-            ticks:{color:'rgba(255,255,255,.52)',callback:value=>formatBRL(value)},
-            grid:{color:'rgba(255,255,255,.055)'},
-            border:{display:false}
-          }
-        }
-      },
-      plugins:[zeroLinePlugin]
+     type:'line',
+     data:{
+       labels,
+       datasets:[
+         // idx 0: fill verde (clipeado acima de zero)
+         {
+           data:equity,
+           tension:.28,
+           fill:'origin',
+           borderWidth:0,
+           borderColor:'transparent',
+           backgroundColor:greenFill,
+           pointRadius:0,
+           pointHoverRadius:0,
+           order:2
+         },
+         // idx 1: fill vermelho (clipeado abaixo de zero)
+         {
+           data:equity,
+           tension:.28,
+           fill:'origin',
+           borderWidth:0,
+           borderColor:'transparent',
+           backgroundColor:redFill,
+           pointRadius:0,
+           pointHoverRadius:0,
+           order:2
+         },
+         // idx 2: linha verde (clipeada acima de zero)
+         {
+           label:'Capital Acumulado',
+           data:equity,
+           ...commonLineProps,
+           borderColor:'#20f7a4',
+           backgroundColor:'transparent',
+           pointHoverBackgroundColor:'#20f7a4'
+         },
+         // idx 3: linha vermelha (clipeada abaixo de zero)
+         {
+           data:equity,
+           ...commonLineProps,
+           borderColor:'#ff5d73',
+           backgroundColor:'transparent',
+           pointHoverBackgroundColor:'#ff5d73'
+         }
+       ]
+     },
+     options:{
+       responsive:true,
+       maintainAspectRatio:false,
+       interaction:{intersect:false,mode:'index'},
+       plugins:{
+         legend:{display:false},
+         title:{display:true,text:'Patrimônio',color:'#ffffff',font:{size:16,weight:'700'}},
+         tooltip:{
+           enabled:false,
+           external:externalEquityTooltip
+         }
+       },
+       scales:{
+         x:{ticks:{display:false},grid:{display:false},border:{display:false}},
+         y:{
+           beginAtZero:false,
+           ticks:{color:'rgba(255,255,255,.52)',callback:value=>formatBRL(value)},
+           grid:{color:'rgba(255,255,255,.055)'},
+           border:{display:false}
+         }
+       }
+     },
+     plugins:[splitClipPlugin,zeroLinePlugin]
    });
  }
 

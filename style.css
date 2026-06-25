@@ -2347,7 +2347,12 @@ body.modal-open{
 }
 
 /* ===== Dia com resultado zerado (R$ 0,00) — contorno amarelo neon ===== */
-.day.zero-result {
-  border: 2.5px solid #ffe600;
-  box-shadow: 0 0 8px 2px #ffe60099, 0 0 18px 4px #ffe60044;
+.day.zero-result{
+ border-color:#fff176 !important;
+ box-shadow:
+  0 0 10px rgba(255,241,118,.95),
+  0 0 24px rgba(255,241,118,.58),
+  0 14px 34px rgba(0,0,0,.28),
+  inset 0 0 14px rgba(255,241,118,.14) !important;
 }
+
