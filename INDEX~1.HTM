@@ -1,0 +1,361 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trader Performance Dashboard Pro</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="insights.css">
+</head>
+<body>
+<div class="glass header">
+<div><h1>Arnold Marques</h1><span>Calendário de Performance</span></div>
+<div class="stats">
+<div class="card"><canvas id="annualSparkline" class="summarySparkline"></canvas><small>Resultado Anual</small><h2 id="annualTotal">R$ 0,00</h2></div>
+<div class="card"><canvas id="allTimeSparkline" class="summarySparkline"></canvas><small>Acumulado Histórico</small><h2 id="allTimeTotal">R$ 0,00</h2></div>
+<div class="card lossCard"><canvas id="grossLossSparkline" class="summarySparkline"></canvas><small>Prejuizo Bruto</small><h2 id="grossLossTotal">R$ 0,00</h2></div>
+</div>
+</div>
+
+<div class="toolbar glass">
+<button id="prev">◀</button>
+<h2 id="monthLabel"></h2>
+<button id="next">▶</button>
+<label>Ano <input id="year" type="number" value="2026"></label>
+</div>
+
+<div class="glass quarterPanel">
+<h2>Resultado Trimestral</h2>
+<div id="quarterGrid" class="quarterGrid">
+<div class="quarterCard" data-quarter="1"><div class="quarterNumber">1</div><div class="quarterInfo"><div class="quarterMonths"><span>JAN</span><span>FEV</span><span>MAR</span></div><div id="quarterTotal1" class="quarterValue">R$ 0,00</div></div></div>
+<div class="quarterCard" data-quarter="2"><div class="quarterNumber">2</div><div class="quarterInfo"><div class="quarterMonths"><span>ABR</span><span>MAI</span><span>JUN</span></div><div id="quarterTotal2" class="quarterValue">R$ 0,00</div></div></div>
+<div class="quarterCard" data-quarter="3"><div class="quarterNumber">3</div><div class="quarterInfo"><div class="quarterMonths"><span>JUL</span><span>AGO</span><span>SET</span></div><div id="quarterTotal3" class="quarterValue">R$ 0,00</div></div></div>
+<div class="quarterCard" data-quarter="4"><div class="quarterNumber">4</div><div class="quarterInfo"><div class="quarterMonths"><span>OUT</span><span>NOV</span><span>DEZ</span></div><div id="quarterTotal4" class="quarterValue">R$ 0,00</div></div></div>
+</div>
+</div>
+
+<div class="glass advancedPanel">
+<div class="advancedHeader">
+<div><h2>Seleção Avançada</h2><span>Arraste pelos dias ou marque os meses desejados</span></div>
+<div class="advancedActions">
+<button id="calendarMoneyView" class="advancedToggle active" type="button">R$</button>
+<button id="calendarPercentView" class="advancedToggle" type="button">%</button>
+<button id="selectionMode" class="advancedAction" type="button">Selecionar dias</button>
+</div>
+</div>
+<div class="advancedGrid">
+<div class="advancedBox">
+<small>Dias selecionados</small>
+<h3 id="selectedDaysTotal">R$ 0,00</h3>
+<p><span id="selectedDaysCount">0</span> dia(s)</p>
+<button id="clearSelectedDays" class="ghostButton" type="button">Limpar seleção</button>
+</div>
+<div class="advancedBox monthBox">
+<small>Meses selecionados</small>
+<h3 id="selectedMonthsTotal">R$ 0,00</h3>
+<p><span id="selectedMonthsCount">12</span> mês(es)</p>
+<div id="monthSelector" class="monthSelector">
+<label><input type="checkbox" value="0" checked>JAN</label>
+<label><input type="checkbox" value="1" checked>FEV</label>
+<label><input type="checkbox" value="2" checked>MAR</label>
+<label><input type="checkbox" value="3" checked>ABR</label>
+<label><input type="checkbox" value="4" checked>MAI</label>
+<label><input type="checkbox" value="5" checked>JUN</label>
+<label><input type="checkbox" value="6" checked>JUL</label>
+<label><input type="checkbox" value="7" checked>AGO</label>
+<label><input type="checkbox" value="8" checked>SET</label>
+<label><input type="checkbox" value="9" checked>OUT</label>
+<label><input type="checkbox" value="10" checked>NOV</label>
+<label><input type="checkbox" value="11" checked>DEZ</label>
+</div>
+</div>
+</div>
+</div>
+
+<div class="weekdays">
+<div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div>
+</div>
+<div id="calendar" class="calendar"></div>
+
+<div id="modal" class="modal hidden">
+<div class="modalBox">
+<h3 id="dateTitle"></h3>
+<input id="result" type="number" step="0.01" placeholder="Resultado R$">
+<input id="points" type="number" placeholder="Pontos">
+<input id="ops" type="number" placeholder="Operações">
+<div id="operationFields" class="operationFields"></div>
+<select id="dayType">
+<option value="">Operado</option>
+<option value="holiday">Feriado</option>
+<option value="notOperated">Dia não Operado</option>
+</select>
+
+<div id="holidayMarketRow" class="holidayMarketRow" style="display:none;">
+  <label class="holidayMarketLabel">Mercado em Feriado:</label>
+  <div class="holidayMarketOptions">
+    <button type="button" class="holidayMarketBtn" data-market="BRL">
+      <img src="BRASIL.png" alt="BRL" class="flagIconBtn"> BRL
+    </button>
+    <button type="button" class="holidayMarketBtn" data-market="EUA">
+      <img src="EUA.png" alt="EUA" class="flagIconBtn"> EUA
+    </button>
+    <button type="button" class="holidayMarketBtn" data-market="BRL/EUA">
+      <img src="BRASIL.png" alt="BRL" class="flagIconBtn"><img src="EUA.png" alt="EUA" class="flagIconBtn"> BRL/EUA
+    </button>
+    <button type="button" class="holidayMarketBtn" data-market="">Nenhum</button>
+  </div>
+</div>
+
+<div class="agendaTrader">
+  <div class="agendaHeader">
+    <span class="agendaTitle">Agenda do Trader</span>
+    <span class="agendaSubtitle" id="agendaSubtitle">Planejamento e diário do dia</span>
+  </div>
+  <div class="agendaTabs">
+    <button class="agendaTab active" data-tab="1" type="button"><span class="agendaTabNum">1</span> Rotina de Pré-Mercado</button>
+    <button class="agendaTab" data-tab="2" type="button"><span class="agendaTabNum">2</span> Gestão de Risco e Metas</button>
+    <button class="agendaTab" data-tab="3" type="button"><span class="agendaTabNum">3</span> Diário de Trading</button>
+  </div>
+
+  <div class="agendaPanel active" data-panel="1">
+    <div class="agendaPanelHeader">
+      <span class="agendaPanelTitle">Rotina de Pré-Mercado</span>
+      <span class="agendaPanelBadge badge-checklist">Checklist</span>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Calendário Econômico:</label>
+      <textarea id="economicCalendar" placeholder="Quais são as notícias de alto impacto e seus horários (ex: dados de inflação, payroll, decisões de juros)."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Panorama Global:</label>
+      <textarea id="globalOverview" placeholder="Direção dos mercados internacionais (S&P 500, Nasdaq, índices europeus e asiáticos) e commodities (petróleo, minério de ferro)."></textarea>
+    </div>
+  </div>
+
+  <div class="agendaPanel" data-panel="2">
+    <div class="agendaPanelHeader">
+      <span class="agendaPanelTitle">Gestão de Risco e Metas</span>
+      <span class="agendaPanelBadge badge-plano">Plano do dia</span>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Stop Loss Diário:</label>
+      <textarea id="dailyStopLoss" placeholder="O valor máximo que você aceita perder no dia. Ao atingi-lo, a agenda dita que o computador deve ser fechado."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Meta de Ganho:</label>
+      <textarea id="profitGoal" placeholder="O objetivo financeiro do dia. Ao alcançá-lo, você encerra as operações para devolver menos dinheiro ao mercado."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Número Máximo de Trades:</label>
+      <textarea id="maxTrades" placeholder="Limite de operações por dia para evitar a exaustão e a super alavancagem."></textarea>
+    </div>
+  </div>
+
+  <div class="agendaPanel" data-panel="3">
+    <div class="agendaPanelHeader">
+      <span class="agendaPanelTitle">Diário de Trading</span>
+      <span class="agendaPanelBadge badge-registro">Registro de Operações</span>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Ativo e Direção:</label>
+      <textarea id="assetDirection" placeholder="Qual ativo foi operado (ex: WIN, DOL, PETR4) e se foi compra ou venda."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Motivo da Entrada:</label>
+      <textarea id="entryReason" placeholder="Justificativa técnica (ex: rompimento de topo, cruzamento de médias móveis, suporte com padrão de candle)."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Preço de Entrada, Stop Loss e Alvo:</label>
+      <textarea id="tradePlan" placeholder="O planejamento inicial da operação."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Resultado:</label>
+      <textarea id="tradeResult" placeholder="Se foi gain (lucro) ou loss (prejuízo) e o valor financeiro."></textarea>
+    </div>
+    <div class="agendaField">
+      <label class="agendaFieldLabel">Erros Cometidos:</label>
+      <textarea id="mistakesMade" placeholder="Anotações sobre desvios do plano (ex: entrada antecipada, não respeitou o stop)."></textarea>
+    </div>
+  </div>
+</div>
+<button id="save">Salvar</button>
+<button id="clearDay">Limpar dados</button>
+<button id="close">Fechar</button>
+</div></div>
+<div class="glass chartsPanel">
+<div class="operationsHeader">
+<h2>Curva de Capital (Equity Curve)</h2>
+<div class="operationsControls">
+<button id="equityMonthView" class="operationView active" type="button">Mensal</button>
+<input id="equityStartDate" class="operationDate" type="date" aria-label="Data inicial da curva de capital">
+<input id="equityEndDate" class="operationDate" type="date" aria-label="Data final da curva de capital">
+<button id="equityYearView" class="operationView" type="button">Anual</button>
+</div>
+</div>
+<canvas id="equityChart"></canvas>
+<div class="operationsHeader">
+<h2>Operações</h2>
+<div class="operationsControls">
+<button id="operationsBarView" class="operationView active" type="button">Barras</button>
+<button id="operationsPieView" class="operationView" type="button">Pizza</button>
+<button id="operationsMonthView" class="operationView active" type="button">Mensal</button>
+<input id="operationsStartDate" class="operationDate" type="date" aria-label="Data inicial">
+<input id="operationsEndDate" class="operationDate" type="date" aria-label="Data final">
+<button id="operationsYearView" class="operationView" type="button">Anual</button>
+</div>
+</div>
+<div class="operationsChartFrame">
+<div id="operationsSummaryBar" class="operationsSummaryBar">
+<div class="operationMetric"><span>Resultado Liq Tot.</span><strong id="operationsNetTotal">R$ 0,00</strong></div>
+<div class="operationMetric"><span>Resultado Total</span><strong id="operationsResultTotal">R$ 0,00</strong></div>
+<div class="operationMetric"><span>Lucro Bruto</span><strong id="operationsGrossProfit">R$ 0,00</strong></div>
+<div class="operationMetric"><span>Prejuizo Bruto</span><strong id="operationsGrossLoss">R$ 0,00</strong></div>
+<div class="operationMetric"><span>Operações</span><strong id="operationsTotalCount">0</strong></div>
+</div>
+<canvas id="monthlyChart"></canvas>
+</div>
+</div>
+<div class="glass econCalPanel">
+  <div class="econCalHeader">
+    <div class="econCalHeaderLeft">
+      <div class="econCalIcon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div>
+        <h2>Calendário Econômico</h2>
+        <span>Eventos de alto impacto em tempo real · Investing.com</span>
+      </div>
+    </div>
+    <div class="econCalBadge">
+      <span class="econCalBadgeDot"></span>
+      Tempo Real
+    </div>
+  </div>
+  <div class="econCalFrame">
+    <div class="econCalScaleWrap">
+    <iframe
+      id="econCalIframe"
+      src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&category=_employment,_economicActivity,_inflation,_credit,_centralBanks,_confidenceIndex,_balance,_Bonds&features=datepicker,timezone,timeselector,filters&countries=17,25,32,6,37,5,22,39,10,35,7,4,12,72&calType=day&timeZone=12&lang=12"
+      frameborder="0"
+      allowtransparency="true"
+      marginwidth="0"
+      marginheight="0"
+      title="Calendário Econômico Investing.com"
+    ></iframe>
+    </div>
+  </div>
+  <div class="econCalFooter">
+    <span>Calendário Econômico fornecido por</span>
+    <a href="https://br.investing.com/" target="_blank" rel="nofollow">Investing.com Brasil</a>
+  </div>
+</div>
+<!-- ===== PAINEL DE INSIGHTS ===== -->
+<div class="glass insightsPanel" id="insightsPanel">
+  <div class="insightsHeader">
+    <div class="insightsHeaderLeft">
+      <div class="insightsIcon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div>
+        <h2>Insights do Mês</h2>
+        <span id="insightsSubtitle">Análise inteligente do seu Diário de Trading</span>
+      </div>
+    </div>
+    <div class="insightsActions">
+      <div class="insightsAiBadge">
+        <span class="insightsAiDot"></span>
+        IA
+      </div>
+      <button id="generateInsightsBtn" class="insightsGenerateBtn" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Gerar Insights
+      </button>
+    </div>
+  </div>
+
+  <!-- Estado vazio -->
+  <div id="insightsEmpty" class="insightsEmpty">
+    <div class="insightsEmptyIcon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </div>
+    <p>Clique em <strong>Gerar Insights</strong> para analisar seu Diário de Trading do mês e receber recomendações personalizadas.</p>
+  </div>
+
+  <!-- Loading -->
+  <div id="insightsLoading" class="insightsLoading hidden">
+    <div class="insightsLoadingSpinner"></div>
+    <p id="insightsLoadingText">Analisando seu diário de trading...</p>
+  </div>
+
+  <!-- Conteúdo dos Insights -->
+  <div id="insightsContent" class="insightsContent hidden">
+    <!-- Resumo do mês -->
+    <div class="insightsSummaryBar" id="insightsSummaryBar"></div>
+
+    <!-- Cards de insights gerados pela IA -->
+    <div class="insightsGrid" id="insightsGrid"></div>
+
+    <!-- Rodapé -->
+    <div class="insightsFooter">
+      <span id="insightsGeneratedAt"></span>
+      <button id="regenerateInsightsBtn" class="insightsRegenBtn" type="button">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Regenerar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="glass importExportPanel">
+  <div class="importExportHeader">
+    <div class="importExportInfo">
+      <h2>Backup de Dados</h2>
+      <span>Exporte seus dados para transferir para outro computador ou como cópia de segurança</span>
+    </div>
+    <div class="importExportBadge">
+      <span class="ieBadgeDot"></span>
+      localStorage
+    </div>
+  </div>
+  <div class="importExportGrid">
+    <div class="importExportCard exportCard">
+      <div class="ieCardIcon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="ieCardText">
+        <strong>Exportar Dados</strong>
+        <p>Baixa um arquivo <code>.json</code> com todos os seus registros de performance</p>
+      </div>
+      <button id="exportBtn" class="ieBtn ieBtnExport" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+    </div>
+    <div class="importExportCard importCard">
+      <div class="ieCardIcon ieCardIconImport">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="15"/></svg>
+      </div>
+      <div class="ieCardText">
+        <strong>Importar Dados</strong>
+        <p>Carrega um arquivo <code>.json</code> exportado anteriormente — os dados atuais serão substituídos</p>
+      </div>
+      <button id="importBtn" class="ieBtn ieBtnImport" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="15"/></svg>
+        Importar
+      </button>
+      <input id="importFileInput" type="file" accept=".json" style="display:none">
+    </div>
+  </div>
+  <div id="ieToast" class="ieToast hidden"></div>
+</div>
+<!-- Modal de confirmação Limpar Dados -->
+<div id="confirmClearModal" class="modal hidden">
+  <div class="confirmBox">
+    <div class="confirmIcon">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </div>
+    <h3 class="confirmTitle">Limpar dados do dia?</h3>
+    <p class="confirmMsg">Esta ação irá apagar todos os dados registrados neste dia. Deseja continuar?</p>
+    <div class="confirmActions">
+      <button id="confirmClearNo" class="confirmBtn confirmBtnNo" type="button">Não</button>
+      <button id="confirmClearYes" class="confirmBtn confirmBtnYes" type="button">Sim, apagar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script><script src="insights.js"></script></body></html>

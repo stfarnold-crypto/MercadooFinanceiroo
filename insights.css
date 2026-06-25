@@ -724,3 +724,90 @@
     height: 36px;
   }
 }
+
+/* =====================================================
+   BARRA DE RESUMO EXPANDIDA — 3 seções temáticas
+   (adicionado na v2.0 sem quebrar o layout original)
+   ===================================================== */
+
+/* Container de cada seção temática dentro da summary bar */
+.insightsSummarySection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.insightsSummarySection:last-child {
+  margin-bottom: 0;
+}
+
+/* Rótulo da seção (ex: "📊 Aba Operações") */
+.insightsSummarySectionLabel {
+  font-size: 10px;
+  font-weight: 800;
+  color: rgba(155, 168, 199, 0.7);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding-left: 2px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Linha de stats dentro de cada seção */
+.insightsSummaryRow {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+
+/* Redefine insightsSummaryBar para se tornar um contêiner vertical */
+.insightsSummaryBar {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 24px;
+}
+
+/* Separador visual entre seções */
+.insightsSummarySection + .insightsSummarySection {
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+/* ---- Responsividade das novas linhas ---- */
+@media (max-width: 1200px) {
+  .insightsSummaryRow {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .insightsSummaryRow {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .insightsSummaryRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .insightsSummarySection {
+    margin-bottom: 10px;
+  }
+
+  .insightsSummarySectionLabel {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 420px) {
+  .insightsSummaryRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+}
