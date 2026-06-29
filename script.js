@@ -205,6 +205,28 @@ function getOperationEntries(data,scope){
  });
 }
 
+function getEquityOperationEntries(data,scope,startDate,endDate){
+ const selectedYear=year.value;
+ return Object.keys(data).sort().flatMap(key=>{
+   if(!key.startsWith(selectedYear+'-')) return [];
+   const dt=new Date(key+'T00:00:00');
+   if(scope==='month' && dt.getMonth()!==month) return [];
+   if(startDate && key<startDate) return [];
+   if(endDate && key>endDate) return [];
+   const dayData=data[key]||{};
+   const hasOperationData = (Array.isArray(dayData.operationResults) && dayData.operationResults.length>0) || Number(dayData.ops||0)>0 || Number(dayData.result||0)!==0;
+   if((dayData.dayType==='holiday' || dayData.dayType==='notOperated') && !hasOperationData) return [];
+   const saved=Array.isArray(dayData.operationResults) ? dayData.operationResults : [];
+   const fallback=(Number(dayData.ops||0)>0 || Number(dayData.result||0)!==0) ? [Number(dayData.result||0)] : [];
+   const values=saved.length ? saved : fallback;
+   return values.map((value,index)=>({
+     key,
+     value:Number(value||0),
+     label:formatDateBR(key)
+   }));
+ });
+}
+
 function getFilteredDateKeys(data,scope,startDate,endDate){
  const selectedYear=year.value;
  return Object.keys(data).filter(key=>{
@@ -494,11 +516,15 @@ function drawCharts(){
  const keys=getFilteredDateKeys(data,equityChartMode,equityRangeStart,equityRangeEnd);
  const allKeys=Object.keys(data).sort();
 
- let acc=0, labels=[], equity=[];
- keys.forEach(k=>{
-   acc+=Number(data[k].result||0);
-   labels.push(formatDateBR(k));
+ // Curva de Capital: usa operações individuais (igual à aba Operações)
+ const equityEntries=getEquityOperationEntries(data,equityChartMode,equityRangeStart,equityRangeEnd);
+ let acc=0, labels=[], equity=[], equityEntryKeys=[], equityEntryValues=[];
+ equityEntries.forEach(entry=>{
+   acc+=Number(entry.value||0);
+   labels.push(entry.label);
    equity.push(acc);
+   equityEntryKeys.push(entry.key);
+   equityEntryValues.push(Number(entry.value||0));
  });
 
  const isPositiveCurve=(equity.length===0 || equity[equity.length-1] >= 0);
@@ -518,8 +544,8 @@ function drawCharts(){
    }
    const point=tooltip.dataPoints && tooltip.dataPoints[0];
    if(!point) return;
-   const key=keys[point.dataIndex];
-   const daily=getDayResultForKey(data,key);
+   const key=equityEntryKeys[point.dataIndex];
+   const opValue=equityEntryValues[point.dataIndex];
    const patrimony=point.parsed.y;
    const positive=patrimony>=0;
    tooltipEl.classList.toggle('negative',!positive);
@@ -527,7 +553,7 @@ function drawCharts(){
      <div class="equityTooltipDate">${formatDateBR(key)}</div>
      <div class="equityTooltipLabel">Patrimônio</div>
      <div class="equityTooltipValue">${formatBRL(patrimony)}</div>
-     <div class="equityTooltipResult">${daily>=0?'+':''}${formatBRL(daily)}</div>
+     <div class="equityTooltipResult">${opValue>=0?'+':''}${formatBRL(opValue)}</div>
    `;
    const rect=chart.canvas.getBoundingClientRect();
    tooltipEl.style.opacity=1;
