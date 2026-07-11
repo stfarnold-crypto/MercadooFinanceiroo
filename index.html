@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Trader Performance Dashboard Pro</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="insights.css">
+<title>Trader Performance Dashboard Pro</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="insights.css"><link rel="stylesheet" href="riskManagement.css">
 </head>
 <body>
 <div class="glass header">
@@ -300,6 +300,106 @@
   </div>
 </div>
 
+<!-- ===== MÓDULO: GERENCIAMENTO DE RISCO PROFISSIONAL (WDO) ===== -->
+<div class="glass riskMgmtPanel" id="riskMgmtPanel">
+  <div class="riskMgmtHeader">
+    <div class="riskMgmtHeaderLeft">
+      <div class="riskMgmtIcon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.25 3.4 9.74 8 11 4.6-1.26 8-5.75 8-11V5l-8-3z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <div>
+        <h2>Gerenciamento de Risco Profissional</h2>
+        <span>Mini Dólar (WDO) · Cálculo automático baseado em risco percentual do capital</span>
+      </div>
+    </div>
+    <div class="riskMgmtBadge">
+      <span class="riskMgmtBadgeDot"></span>
+      WDO · R$10,00/pt
+    </div>
+  </div>
+
+  <div class="riskMgmtInputs">
+    <div class="riskMgmtInputGroup">
+      <label for="rmCapital">Capital Inicial</label>
+      <input id="rmCapital" type="text" inputmode="decimal" placeholder="R$ 0,00">
+    </div>
+    <div class="riskMgmtInputGroup">
+      <label for="rmStopPoints">Stop por Operação (pontos)</label>
+      <input id="rmStopPoints" type="number" min="0" step="0.5" placeholder="Ex: 2">
+    </div>
+    <div class="riskMgmtInputGroup">
+      <label for="rmMetaMensal">Meta Financeira Mensal</label>
+      <input id="rmMetaMensal" type="text" inputmode="decimal" placeholder="R$ 0,00">
+    </div>
+  </div>
+
+  <div class="riskMgmtResultsGrid">
+    <div class="riskMgmtResultCard">
+      <small>Capital Atual</small>
+      <strong id="rmOutCapital">R$ 0,00</strong>
+    </div>
+    <div class="riskMgmtResultCard highlight">
+      <small>Quantidade Ideal de Contratos</small>
+      <strong id="rmOutContracts">0</strong>
+    </div>
+    <div class="riskMgmtResultCard">
+      <small>Valor Arriscado por Operação</small>
+      <strong id="rmOutRiskValue">R$ 0,00</strong>
+    </div>
+    <div class="riskMgmtResultCard">
+      <small>Percentual Arriscado</small>
+      <strong id="rmOutRiskPercent">0,00%</strong>
+    </div>
+    <div class="riskMgmtResultCard warn">
+      <small>Perda Máxima Diária</small>
+      <strong id="rmOutDailyLoss">R$ 0,00</strong>
+    </div>
+    <div class="riskMgmtResultCard warn">
+      <small>Drawdown Máximo</small>
+      <strong id="rmOutDrawdown">R$ 0,00</strong>
+    </div>
+    <div class="riskMgmtResultCard">
+      <small>Operações Máximas por Dia</small>
+      <strong>4</strong>
+    </div>
+    <div class="riskMgmtResultCard">
+      <small>Stops Consecutivos Permitidos</small>
+      <strong id="rmOutMaxStops">0</strong>
+    </div>
+    <div class="riskMgmtResultCard">
+      <small>Relação Risco x Retorno</small>
+      <strong>5:1</strong>
+    </div>
+    <div class="riskMgmtResultCard highlight">
+      <small>Meta Mensal</small>
+      <strong id="rmOutMeta">R$ 0,00</strong>
+    </div>
+  </div>
+
+  <div class="riskMgmtTargetsSection">
+    <h3>Projeção por Alvo (pontos)</h3>
+    <div class="riskMgmtTargetsTable" id="rmTargetsTable"></div>
+  </div>
+
+  <div class="riskMgmtPlanSection">
+    <h3>Plano de Gerenciamento</h3>
+    <ul class="riskMgmtPlanList">
+      <li>✅ Arriscar no máximo 1% do capital por operação.</li>
+      <li>✅ Operar apenas a quantidade de contratos calculada automaticamente.</li>
+      <li>✅ Nunca aumentar contratos para recuperar prejuízo.</li>
+      <li>✅ Operar somente em dias com tendência.</li>
+      <li>✅ Não operar mercado lateral.</li>
+      <li>✅ Operar apenas quando houver relação mínima de 5:1.</li>
+      <li>✅ Encerrar o dia após atingir o stop diário.</li>
+      <li>✅ Nunca ultrapassar quatro operações por dia.</li>
+      <li id="rmPlanMaxStops">✅ Após 3 stops consecutivos encerrar imediatamente o pregão.</li>
+      <li>✅ Nunca alterar o stop de dois pontos.</li>
+      <li>✅ Deixar o lucro correr até o alvo planejado.</li>
+      <li>✅ Proteger o capital antes de pensar em aumentar o patrimônio.</li>
+    </ul>
+  </div>
+</div>
+
 <div class="glass importExportPanel">
   <div class="importExportHeader">
     <div class="importExportInfo">
@@ -358,4 +458,4 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="script.js"></script><script src="insights.js"></script></body></html>
+<script src="script.js"></script><script src="insights.js"></script><script src="riskManagement.js"></script></body></html>
