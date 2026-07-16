@@ -400,6 +400,1080 @@
   </div>
 </div>
 
+<!-- ===== MÓDULO: FX PIP DESK (Calculadora de Stop & Alvo) ===== -->
+<div class="glass fxPipDeskOuter" id="fxPipDeskPanel">
+<style>
+
+  #fxPipDeskPanel {
+    --void:#0E1220;
+    --panel:#161B2C;
+    --panel-2:#1B2136;
+    --border:#262E44;
+    --border-soft:#20263A;
+    --text:#EDEFF5;
+    --muted:#8A93AC;
+    --muted-2:#5B6478;
+    --gold:#C9A227;
+    --gold-dim:#8A7220;
+    --buy:#4FA184;
+    --buy-soft:rgba(79,161,132,0.14);
+    --sell:#C1554A;
+    --sell-soft:rgba(193,85,74,0.14);
+    --radius:10px;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --font-body:'Inter', sans-serif;
+  }
+
+  #fxPipDeskPanel * {box-sizing:border-box;}
+  #fxPipDeskPanel {margin:0;padding:0;}
+  #fxPipDeskPanel {
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(201,162,39,0.07), transparent),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(79,161,132,0.06), transparent),
+      var(--void);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.4;
+    margin-top:20px;
+    padding:24px;
+  }
+
+  #fxPipDeskPanel a {color:inherit;}
+
+  #fxPipDeskPanel ::selection {background:var(--gold);color:#14170C;}
+
+  /* ---------- Layout shell ---------- */
+  #fxPipDeskPanel .app {
+    max-width:100%;
+    margin:0;
+    padding:0;
+  }
+
+  #fxPipDeskPanel header.top {
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    padding-bottom:22px;
+    margin-bottom:22px;
+    border-bottom:1px solid var(--border-soft);
+    flex-wrap:wrap;
+  }
+
+  #fxPipDeskPanel .brand-eyebrow {
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.16em;
+    color:var(--gold);
+    text-transform:uppercase;
+    margin:0 0 6px;
+  }
+
+  #fxPipDeskPanel h1 {
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:30px;
+    letter-spacing:-0.01em;
+    margin:0 0 6px;
+  }
+
+  #fxPipDeskPanel .tagline {
+    color:var(--muted);
+    font-size:14px;
+    margin:0;
+    max-width:46ch;
+  }
+
+  #fxPipDeskPanel .clock-block {
+    text-align:right;
+    font-family:var(--font-mono);
+    color:var(--muted);
+    font-size:12px;
+    min-width:150px;
+  }
+  #fxPipDeskPanel .clock-block .time {
+    font-size:20px;
+    color:var(--text);
+    letter-spacing:0.02em;
+  }
+
+  #fxPipDeskPanel .layout {
+    display:grid;
+    grid-template-columns:220px minmax(0,1fr);
+    gap:22px;
+    align-items:start;
+  }
+
+  @media (max-width:860px) {
+    #fxPipDeskPanel .layout {grid-template-columns:minmax(0,1fr);}
+  }
+
+  /* ---------- Sidebar: pair list ---------- */
+  #fxPipDeskPanel .pair-list {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+
+  #fxPipDeskPanel .pair-list-label {
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    padding:6px 10px 8px;
+  }
+
+  @media (max-width:860px) {
+    #fxPipDeskPanel .pair-list {
+      flex-direction:row;
+      overflow-x:auto;
+      gap:8px;
+    }
+    #fxPipDeskPanel .pair-list-label {display:none;}
+  }
+
+  #fxPipDeskPanel .pair-btn {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:8px;
+    padding:10px 10px;
+    color:var(--muted);
+    font-family:var(--font-mono);
+    font-size:13.5px;
+    cursor:pointer;
+    text-align:left;
+    white-space:nowrap;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  #fxPipDeskPanel .pair-btn:hover {
+    background:var(--panel-2);
+    color:var(--text);
+  }
+  #fxPipDeskPanel .pair-btn:focus-visible {
+    outline:2px solid var(--gold);
+    outline-offset:1px;
+  }
+  #fxPipDeskPanel .pair-btn.active {
+    background:linear-gradient(180deg, rgba(201,162,39,0.14), rgba(201,162,39,0.05));
+    border-color:rgba(201,162,39,0.4);
+    color:var(--text);
+  }
+  #fxPipDeskPanel .pair-btn.active .pip-tag {
+    color:var(--gold);
+    border-color:rgba(201,162,39,0.5);
+  }
+  #fxPipDeskPanel .pip-tag {
+    font-size:10px;
+    color:var(--muted-2);
+    border:1px solid var(--border);
+    border-radius:5px;
+    padding:2px 5px;
+    letter-spacing:0.02em;
+  }
+
+  /* ---------- Main panel ---------- */
+  #fxPipDeskPanel .main-panel {
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  #fxPipDeskPanel .card {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px 22px;
+    /* Reset properties leaked from the dashboard's global .card rule
+       (style.css), which otherwise shrinks this box via flex-basis and
+       clips overflowing content — that was cutting off the risk/reward
+       highlight boxes below their natural height. */
+    flex:none;
+    overflow:visible;
+    min-width:0;
+    box-shadow:none;
+    position:relative;
+  }
+
+  #fxPipDeskPanel .pair-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+
+  #fxPipDeskPanel .pair-title {
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+  }
+  #fxPipDeskPanel .pair-title .name {
+    font-family:var(--font-display);
+    font-size:24px;
+    font-weight:600;
+    letter-spacing:0.01em;
+  }
+  #fxPipDeskPanel .pair-title .quote-badge {
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:3px 8px;
+  }
+
+  #fxPipDeskPanel .direction-toggle {
+    display:flex;
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  #fxPipDeskPanel .dir-btn {
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    letter-spacing:0.05em;
+    padding:8px 16px;
+    background:var(--panel-2);
+    color:var(--muted);
+    border:none;
+    cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  #fxPipDeskPanel .dir-btn:focus-visible {outline:2px solid var(--gold); outline-offset:-2px;}
+  #fxPipDeskPanel .dir-btn.buy.active {background:var(--buy-soft); color:var(--buy);}
+  #fxPipDeskPanel .dir-btn.sell.active {background:var(--sell-soft); color:var(--sell);}
+
+  #fxPipDeskPanel .mode-row {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  #fxPipDeskPanel .mode-row .mode-label {
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+  }
+  #fxPipDeskPanel .dir-btn.mode.active {background:rgba(201,162,39,0.14); color:var(--gold);}
+
+  #fxPipDeskPanel .hidden {display:none !important;}
+
+  /* ---------- Inputs ---------- */
+  #fxPipDeskPanel .input-grid {
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:14px;
+    margin-top:18px;
+  }
+  @media (max-width:720px) {
+    #fxPipDeskPanel .input-grid {grid-template-columns:repeat(2, minmax(0,1fr));}
+  }
+  @media (max-width:480px) {
+    #fxPipDeskPanel .input-grid {grid-template-columns:minmax(0,1fr);}
+  }
+
+  #fxPipDeskPanel .field label {
+    display:block;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    margin-bottom:7px;
+  }
+  #fxPipDeskPanel .field input {
+    width:100%;
+    background:var(--void);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:10px 11px;
+    color:var(--text);
+    font-family:var(--font-mono);
+    font-size:15px;
+    transition:border-color 0.15s ease;
+  }
+  #fxPipDeskPanel .field input:focus-visible {
+    outline:none;
+    border-color:var(--gold);
+  }
+  #fxPipDeskPanel .field.stop input {color:var(--sell);}
+  #fxPipDeskPanel .field.target input {color:var(--buy);}
+
+  #fxPipDeskPanel .warning {
+    margin-top:14px;
+    font-size:12.5px;
+    color:var(--gold);
+    background:rgba(201,162,39,0.08);
+    border:1px solid rgba(201,162,39,0.3);
+    border-radius:7px;
+    padding:9px 12px;
+    display:none;
+  }
+  #fxPipDeskPanel .warning.show {display:block;}
+
+  /* ---------- Ruler (signature element) ---------- */
+  #fxPipDeskPanel .ruler-card .card-label {
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    margin-bottom:26px;
+  }
+
+  #fxPipDeskPanel .ruler {
+    position:relative;
+    height:120px;
+    margin:0 10px;
+  }
+
+  #fxPipDeskPanel .ruler-baseline {
+    position:absolute;
+    left:0; right:0; top:60px;
+    height:1px;
+    background:var(--border);
+  }
+
+  #fxPipDeskPanel .ruler-ticks {
+    position:absolute;
+    left:0; right:0; top:60px;
+    height:8px;
+    background-image:repeating-linear-gradient(90deg, var(--border-soft) 0, var(--border-soft) 1px, transparent 1px, transparent calc(100%/20));
+  }
+
+  #fxPipDeskPanel .zone {
+    position:absolute;
+    top:56px;
+    height:9px;
+    border-radius:5px;
+    transition:left 0.35s ease, width 0.35s ease;
+  }
+  #fxPipDeskPanel .zone.risk {background:var(--sell-soft); border:1px solid rgba(193,85,74,0.4);}
+  #fxPipDeskPanel .zone.reward {background:var(--buy-soft); border:1px solid rgba(79,161,132,0.4);}
+
+  #fxPipDeskPanel .zone-label {
+    position:absolute;
+    top:34px;
+    transform:translateX(-50%);
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    white-space:nowrap;
+    transition:left 0.35s ease;
+  }
+  #fxPipDeskPanel .zone-label.risk {color:var(--sell);}
+  #fxPipDeskPanel .zone-label.reward {color:var(--buy);}
+
+  #fxPipDeskPanel .pin {
+    position:absolute;
+    top:60px;
+    transform:translate(-50%, -50%);
+    transition:left 0.35s ease;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  #fxPipDeskPanel .pin .dot {
+    width:12px; height:12px;
+    border-radius:3px;
+    transform:rotate(45deg);
+    border:2px solid var(--void);
+  }
+  #fxPipDeskPanel .pin.entry .dot {
+    width:14px;height:14px;
+    border-radius:50%;
+    transform:none;
+    background:var(--gold);
+    box-shadow:0 0 0 4px rgba(201,162,39,0.16);
+  }
+  #fxPipDeskPanel .pin.stop .dot {background:var(--sell);}
+  #fxPipDeskPanel .pin.target .dot {background:var(--buy);}
+
+  #fxPipDeskPanel .pin .pin-label {
+    position:absolute;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+    white-space:nowrap;
+    background:var(--panel);
+    padding:2px 6px;
+    border-radius:5px;
+    border:1px solid var(--border-soft);
+  }
+  #fxPipDeskPanel .pin.entry .pin-label { top:-34px; color:var(--gold); border-color:rgba(201,162,39,0.35);}
+  #fxPipDeskPanel .pin.stop .pin-label { top:16px; color:var(--sell); border-color:rgba(193,85,74,0.3);}
+  #fxPipDeskPanel .pin.target .pin-label { top:16px; color:var(--buy); border-color:rgba(79,161,132,0.3);}
+
+  @media (prefers-reduced-motion: reduce) {
+    #fxPipDeskPanel .zone, #fxPipDeskPanel .zone-label, #fxPipDeskPanel .pin {transition:none;}
+  }
+
+  /* ---------- Results ---------- */
+  #fxPipDeskPanel .results-grid {
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:14px;
+  }
+  @media (max-width:720px) {
+    #fxPipDeskPanel .results-grid {grid-template-columns:repeat(2, minmax(0,1fr));}
+  }
+
+  #fxPipDeskPanel .result {
+    background:var(--void);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:14px 16px;
+  }
+  #fxPipDeskPanel .result .label {
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    margin-bottom:8px;
+  }
+  #fxPipDeskPanel .result .value {
+    font-family:var(--font-display);
+    font-size:22px;
+    font-weight:600;
+    margin-top:0;
+    color:var(--text);
+  }
+  #fxPipDeskPanel .result.stop .value {color:var(--sell);}
+  #fxPipDeskPanel .result.target .value {color:var(--buy);}
+  #fxPipDeskPanel .result .sub {
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+    margin-top:4px;
+  }
+
+  #fxPipDeskPanel .lot-row {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  #fxPipDeskPanel .lot-row .field {max-width:140px;}
+  #fxPipDeskPanel .lot-note {
+    font-size:12px;
+    color:var(--muted);
+    font-family:var(--font-mono);
+  }
+
+  /* ---------- Field label row + Preço/Pips mode toggle ---------- */
+  #fxPipDeskPanel .field-label-row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px 8px;
+    margin-bottom:7px;
+    flex-wrap:wrap;
+  }
+  #fxPipDeskPanel .field-label-row label {margin-bottom:0;}
+
+  #fxPipDeskPanel .field-mode-toggle {
+    display:flex;
+    border:1px solid var(--border);
+    border-radius:6px;
+    overflow:hidden;
+    flex-shrink:0;
+  }
+  #fxPipDeskPanel .field-mode-toggle .mode-btn {
+    font-family:var(--font-mono);
+    font-size:9.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    padding:5px 8px;
+    background:var(--void);
+    color:var(--muted-2);
+    border:none;
+    cursor:pointer;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  #fxPipDeskPanel .field-mode-toggle .mode-btn:not(:last-child) {
+    border-right:1px solid var(--border);
+  }
+  #fxPipDeskPanel .field-mode-toggle .mode-btn:hover {color:var(--text);}
+  #fxPipDeskPanel .field-mode-toggle .mode-btn.active {
+    background:rgba(201,162,39,0.16);
+    color:var(--gold);
+  }
+  #fxPipDeskPanel .field-mode-toggle .mode-btn:focus-visible {
+    outline:2px solid var(--gold);
+    outline-offset:-2px;
+  }
+
+  /* ---------- Risk/Reward highlight boxes ---------- */
+  #fxPipDeskPanel .highlight-grid {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:14px;
+    margin-top:18px;
+  }
+  @media (max-width:720px) {
+    #fxPipDeskPanel .highlight-grid {grid-template-columns:minmax(0,1fr);}
+  }
+  #fxPipDeskPanel .highlight-box {
+    position:relative;
+    overflow:hidden;
+    border-radius:12px;
+    padding:18px 20px;
+    border:1px solid var(--border);
+  }
+  #fxPipDeskPanel .highlight-box.risk {
+    background:linear-gradient(160deg, rgba(193,85,74,0.16), rgba(193,85,74,0.03));
+    border-color:rgba(193,85,74,0.45);
+    box-shadow:0 0 0 1px rgba(193,85,74,0.08) inset;
+  }
+  #fxPipDeskPanel .highlight-box.reward {
+    background:linear-gradient(160deg, rgba(79,161,132,0.16), rgba(79,161,132,0.03));
+    border-color:rgba(79,161,132,0.45);
+    box-shadow:0 0 0 1px rgba(79,161,132,0.08) inset;
+  }
+  #fxPipDeskPanel .highlight-box .h-label {
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  #fxPipDeskPanel .highlight-box.risk .h-label {color:var(--sell);}
+  #fxPipDeskPanel .highlight-box.reward .h-label {color:var(--buy);}
+  #fxPipDeskPanel .highlight-box .h-value {
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:36px;
+    letter-spacing:-0.01em;
+    line-height:1.1;
+  }
+  #fxPipDeskPanel .highlight-box.risk .h-value {color:var(--sell);}
+  #fxPipDeskPanel .highlight-box.reward .h-value {color:var(--buy);}
+  #fxPipDeskPanel .highlight-box .h-sub {
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:6px;
+  }
+
+  #fxPipDeskPanel footer.disclaimer {
+    margin-top:26px;
+    font-size:11.5px;
+    color:var(--muted-2);
+    text-align:center;
+    line-height:1.6;
+  }
+
+  /* ---------- Mobile refinements ---------- */
+  @media (max-width:600px) {
+    #fxPipDeskPanel .app {padding:0;}
+
+    #fxPipDeskPanel header.top {
+      gap:12px;
+      padding-bottom:18px;
+      margin-bottom:18px;
+    }
+    #fxPipDeskPanel .clock-block {
+      text-align:left;
+      min-width:0;
+    }
+    #fxPipDeskPanel h1 {font-size:25px;}
+
+    #fxPipDeskPanel .card {padding:16px 16px;}
+
+    #fxPipDeskPanel .pair-header {gap:12px;}
+    #fxPipDeskPanel .pair-title {gap:8px; flex-wrap:wrap;}
+    #fxPipDeskPanel .pair-title .name {font-size:21px;}
+
+    #fxPipDeskPanel .direction-toggle {flex:1 1 auto;}
+    #fxPipDeskPanel .dir-btn {flex:1 1 auto; text-align:center; padding:10px 12px;}
+
+    /* Prevent iOS Safari from auto-zooming when a number input is focused */
+    #fxPipDeskPanel .field input {font-size:16px; padding:11px 12px;}
+
+    #fxPipDeskPanel .ruler-card {padding:16px 14px 20px;}
+    #fxPipDeskPanel .ruler {margin:0 4px;}
+
+    #fxPipDeskPanel .highlight-box {padding:16px 16px;}
+    #fxPipDeskPanel .highlight-box .h-value {font-size:28px;}
+  }
+
+  @media (max-width:380px) {
+    #fxPipDeskPanel .pair-title .quote-badge {display:none;}
+    #fxPipDeskPanel .highlight-box .h-value {font-size:24px;}
+  }
+
+  /* Comfortable tap targets on touch devices */
+  @media (hover:none) and (pointer:coarse) {
+    #fxPipDeskPanel .mode-btn {padding:7px 9px; font-size:10px;}
+    #fxPipDeskPanel .dir-btn {padding:11px 16px;}
+    #fxPipDeskPanel .pair-btn {padding:12px 10px;}
+  }
+
+</style>
+<div class="app">
+
+  <header class="top">
+    <div>
+      <p class="brand-eyebrow">Mesa de operações · Forex</p>
+      <h1>FX Pip Desk</h1>
+      <p class="tagline">Meça o risco e o alvo em pips antes de puxar o gatilho, para os principais pares negociados.</p>
+    </div>
+    <div class="clock-block">
+      <div id="clock-date">—</div>
+      <div class="time" id="clock-time">--:--:--</div>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- Sidebar: pairs -->
+    <nav class="pair-list" id="pair-list" aria-label="Selecionar par de moedas">
+      <div class="pair-list-label">Ativos</div>
+      <!-- buttons injected by JS -->
+    </nav>
+
+    <!-- Main panel -->
+    <div class="main-panel">
+
+      <section class="card">
+        <div class="pair-header">
+          <div class="pair-title">
+            <span class="name" id="active-pair-name">EURUSD</span>
+            <span class="quote-badge" id="active-pair-quote">Cotado em USD · pip 0.0001</span>
+          </div>
+          <div class="direction-toggle" role="group" aria-label="Direção da operação">
+            <button class="dir-btn buy active" id="btn-buy" aria-pressed="true">COMPRA</button>
+            <button class="dir-btn sell" id="btn-sell" aria-pressed="false">VENDA</button>
+          </div>
+        </div>
+
+        <div class="input-grid">
+          <div class="field">
+            <label for="in-entry">Entrada</label>
+            <input type="number" id="in-entry" step="0.00001" value="1.08500">
+          </div>
+          <div class="field stop">
+            <div class="field-label-row">
+              <label for="in-stop">Stop loss</label>
+              <div class="field-mode-toggle" data-field="stop">
+                <button type="button" class="mode-btn active" data-mode="price">Preço</button>
+                <button type="button" class="mode-btn" data-mode="pips">Pips</button>
+              </div>
+            </div>
+            <input type="number" id="in-stop" step="0.00001" value="1.08200">
+            <input type="number" id="in-stop-pips" class="hidden" step="0.1" min="0" value="30.0">
+          </div>
+          <div class="field target">
+            <div class="field-label-row">
+              <label for="in-target">Alvo</label>
+              <div class="field-mode-toggle" data-field="target">
+                <button type="button" class="mode-btn active" data-mode="price">Preço</button>
+                <button type="button" class="mode-btn" data-mode="pips">Pips</button>
+              </div>
+            </div>
+            <input type="number" id="in-target" step="0.00001" value="1.09100">
+            <input type="number" id="in-target-pips" class="hidden" step="0.1" min="0" value="60.0">
+          </div>
+          <div class="field">
+            <label for="in-lots">Lotes (padrão)</label>
+            <input type="number" id="in-lots" step="0.01" min="0" value="1.00">
+          </div>
+        </div>
+
+        <div class="warning" id="warning-box"></div>
+      </section>
+
+      <section class="card ruler-card">
+        <div class="card-label">Régua de distância — risco à esquerda, alvo à direita do preço de entrada</div>
+        <div class="ruler" id="ruler">
+          <div class="ruler-ticks"></div>
+          <div class="ruler-baseline"></div>
+          <div class="zone risk" id="zone-risk"></div>
+          <div class="zone reward" id="zone-reward"></div>
+          <div class="zone-label risk" id="zone-risk-label"></div>
+          <div class="zone-label reward" id="zone-reward-label"></div>
+          <div class="pin stop" id="pin-stop"><div class="dot"></div><div class="pin-label" id="pin-stop-label"></div></div>
+          <div class="pin entry" id="pin-entry"><div class="dot"></div><div class="pin-label" id="pin-entry-label"></div></div>
+          <div class="pin target" id="pin-target"><div class="dot"></div><div class="pin-label" id="pin-target-label"></div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="results-grid">
+          <div class="result stop">
+            <div class="label">Stop em pips</div>
+            <div class="value" id="res-stop-pips">—</div>
+            <div class="sub" id="res-stop-price">—</div>
+          </div>
+          <div class="result target">
+            <div class="label">Alvo em pips</div>
+            <div class="value" id="res-target-pips">—</div>
+            <div class="sub" id="res-target-price">—</div>
+          </div>
+          <div class="result">
+            <div class="label">Risco : Retorno</div>
+            <div class="value" id="res-rr">—</div>
+            <div class="sub">alvo ÷ stop</div>
+          </div>
+          <div class="result">
+            <div class="label">Valor do pip</div>
+            <div class="value" id="res-pip-value">—</div>
+            <div class="sub" id="res-pip-value-note">—</div>
+          </div>
+        </div>
+
+        <div class="highlight-grid">
+          <div class="highlight-box risk">
+            <div class="h-label">Risco estimado</div>
+            <div class="h-value" id="res-risk-money">—</div>
+            <div class="h-sub">valor perdido se o stop for atingido</div>
+          </div>
+          <div class="highlight-box reward">
+            <div class="h-label">Retorno estimado</div>
+            <div class="h-value" id="res-reward-money">—</div>
+            <div class="h-sub">valor ganho se o alvo for atingido</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <footer class="disclaimer">
+    Ferramenta de planejamento — os valores em dinheiro assumem lote padrão de 100.000 unidades e não substituem a cotação em tempo real da sua corretora.<br>
+    Para USDJPY e USDCAD, o valor do pip é convertido para USD usando o próprio preço de entrada. Para EURGBP e EURJPY, o valor é exibido na moeda de cotação.
+  </footer>
+
+</div>
+</div>
+<script>
+(function(){
+  const PAIRS = {
+    EURUSD:{pipSize:0.0001, quote:'USD', base:'EUR'},
+    USDJPY:{pipSize:0.01,   quote:'JPY', base:'USD'},
+    GBPUSD:{pipSize:0.0001, quote:'USD', base:'GBP'},
+    AUDUSD:{pipSize:0.0001, quote:'USD', base:'AUD'},
+    USDCAD:{pipSize:0.0001, quote:'CAD', base:'USD'},
+    NZDUSD:{pipSize:0.0001, quote:'USD', base:'NZD'},
+    EURGBP:{pipSize:0.0001, quote:'GBP', base:'EUR'},
+    EURJPY:{pipSize:0.01,   quote:'JPY', base:'EUR'},
+  };
+  const SYMBOL = {USD:'$', JPY:'¥', GBP:'£', CAD:'C$'};
+
+  const state = {
+    pair:'EURUSD',
+    direction:'buy',
+    stopMode:'price',
+    targetMode:'price',
+  };
+
+  const pairListEl = document.getElementById('pair-list');
+  const els = {
+    name: document.getElementById('active-pair-name'),
+    quote: document.getElementById('active-pair-quote'),
+    entry: document.getElementById('in-entry'),
+    stop: document.getElementById('in-stop'),
+    stopPips: document.getElementById('in-stop-pips'),
+    target: document.getElementById('in-target'),
+    targetPips: document.getElementById('in-target-pips'),
+    lots: document.getElementById('in-lots'),
+    btnBuy: document.getElementById('btn-buy'),
+    btnSell: document.getElementById('btn-sell'),
+    warning: document.getElementById('warning-box'),
+    resStopPips: document.getElementById('res-stop-pips'),
+    resStopPrice: document.getElementById('res-stop-price'),
+    resTargetPips: document.getElementById('res-target-pips'),
+    resTargetPrice: document.getElementById('res-target-price'),
+    resRR: document.getElementById('res-rr'),
+    resPipValue: document.getElementById('res-pip-value'),
+    resPipValueNote: document.getElementById('res-pip-value-note'),
+    resRisk: document.getElementById('res-risk-money'),
+    resReward: document.getElementById('res-reward-money'),
+    ruler: document.getElementById('ruler'),
+    zoneRisk: document.getElementById('zone-risk'),
+    zoneReward: document.getElementById('zone-reward'),
+    zoneRiskLabel: document.getElementById('zone-risk-label'),
+    zoneRewardLabel: document.getElementById('zone-reward-label'),
+    pinStop: document.getElementById('pin-stop'),
+    pinEntry: document.getElementById('pin-entry'),
+    pinTarget: document.getElementById('pin-target'),
+    pinStopLabel: document.getElementById('pin-stop-label'),
+    pinEntryLabel: document.getElementById('pin-entry-label'),
+    pinTargetLabel: document.getElementById('pin-target-label'),
+  };
+
+  function buildPairList(){
+    Object.keys(PAIRS).forEach(key=>{
+      const p = PAIRS[key];
+      const btn = document.createElement('button');
+      btn.className = 'pair-btn' + (key===state.pair ? ' active' : '');
+      btn.setAttribute('data-pair', key);
+      btn.innerHTML = `<span>${key.slice(0,3)}/${key.slice(3)}</span><span class="pip-tag">${p.pipSize===0.01?'2dp':'4dp'}</span>`;
+      btn.addEventListener('click', ()=>{
+        state.pair = key;
+        document.querySelectorAll('.pair-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        applyDefaultsForPair(key);
+        render();
+      });
+      pairListEl.appendChild(btn);
+    });
+  }
+
+  function decimalsForPip(pipSize){
+    return pipSize === 0.01 ? 3 : 5;
+  }
+
+  function applyDefaultsForPair(key){
+    // Sensible illustrative defaults per pair so the form is never empty.
+    const defaults = {
+      EURUSD:{entry:1.08500, stop:1.08200, target:1.09100},
+      USDJPY:{entry:157.300, stop:156.950, target:158.100},
+      GBPUSD:{entry:1.27300, stop:1.26950, target:1.28100},
+      AUDUSD:{entry:0.65900, stop:0.65650, target:0.66350},
+      USDCAD:{entry:1.36800, stop:1.36450, target:1.37500},
+      NZDUSD:{entry:0.60700, stop:0.60450, target:0.61150},
+      EURGBP:{entry:0.85200, stop:0.84950, target:0.85650},
+      EURJPY:{entry:170.600, stop:169.950, target:171.700},
+    };
+    const d = defaults[key];
+    els.entry.value = d.entry;
+    els.stop.value = d.stop;
+    els.target.value = d.target;
+    const dec = decimalsForPip(PAIRS[key].pipSize);
+    [els.entry, els.stop, els.target].forEach(inp=>{
+      inp.step = (1/Math.pow(10,dec)).toFixed(dec);
+    });
+    // Keep the manual pip fields in sync with the illustrative price defaults.
+    const pipSize = PAIRS[key].pipSize;
+    els.stopPips.value = (Math.abs(d.entry - d.stop) / pipSize).toFixed(1);
+    els.targetPips.value = (Math.abs(d.target - d.entry) / pipSize).toFixed(1);
+  }
+
+  function setFieldMode(field, mode){
+    // field: 'stop' or 'target'
+    state[field + 'Mode'] = mode;
+    document.querySelectorAll(`.field-mode-toggle[data-field="${field}"] .mode-btn`).forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+    const priceInput = field === 'stop' ? els.stop : els.target;
+    const pipsInput = field === 'stop' ? els.stopPips : els.targetPips;
+    priceInput.classList.toggle('hidden', mode !== 'price');
+    pipsInput.classList.toggle('hidden', mode !== 'pips');
+    render();
+  }
+
+  document.querySelectorAll('.field-mode-toggle .mode-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      setFieldMode(btn.closest('.field-mode-toggle').dataset.field, btn.dataset.mode);
+    });
+  });
+
+  function setDirection(dir){
+    state.direction = dir;
+    els.btnBuy.classList.toggle('active', dir==='buy');
+    els.btnSell.classList.toggle('active', dir==='sell');
+    els.btnBuy.setAttribute('aria-pressed', dir==='buy');
+    els.btnSell.setAttribute('aria-pressed', dir==='sell');
+    render();
+  }
+
+  els.btnBuy.addEventListener('click', ()=>setDirection('buy'));
+  els.btnSell.addEventListener('click', ()=>setDirection('sell'));
+  [els.entry, els.stop, els.stopPips, els.target, els.targetPips, els.lots].forEach(inp=>{
+    inp.addEventListener('input', render);
+  });
+
+  function pipValueInfo(pairKey, entryPrice, lots){
+    const p = PAIRS[pairKey];
+    const raw = p.pipSize * 100000 * lots; // value of one pip, in quote currency, for given lot size
+    if(p.quote === 'USD'){
+      return { amountUSD: raw, display: `$${raw.toFixed(2)}`, note:'por pip, em USD', currencySymbol:'$', nativeAmount: raw };
+    }
+    if(pairKey === 'USDJPY' || pairKey === 'USDCAD'){
+      const usd = entryPrice ? raw/entryPrice : null;
+      return {
+        amountUSD: usd,
+        display: usd!=null ? `$${usd.toFixed(2)}` : '—',
+        note: `≈ ${SYMBOL[p.quote]}${raw.toFixed(2)} convertido pelo preço de entrada`,
+        currencySymbol:'$',
+        nativeAmount: usd
+      };
+    }
+    // EURGBP, EURJPY — cross pairs, show native quote currency only
+    const symbol = SYMBOL[p.quote] || p.quote;
+    return {
+      amountUSD: null,
+      display: `${symbol}${raw.toFixed(2)}`,
+      note: `por pip, em ${p.quote} — converta pela taxa ${p.quote}/USD atual`,
+      currencySymbol: symbol,
+      nativeAmount: raw
+    };
+  }
+
+  function render(){
+    const p = PAIRS[state.pair];
+    const dec = decimalsForPip(p.pipSize);
+
+    els.name.textContent = state.pair.slice(0,3) + '/' + state.pair.slice(3);
+    els.quote.textContent = `Cotado em ${p.quote} · pip ${p.pipSize}`;
+
+    const entry = parseFloat(els.entry.value);
+    const lots = parseFloat(els.lots.value) || 0;
+
+    // Stop loss: use manual pips (converted to price) or the direct price field.
+    let stop;
+    if(state.stopMode === 'pips'){
+      const stopPipsInput = parseFloat(els.stopPips.value);
+      stop = (!isNaN(entry) && !isNaN(stopPipsInput))
+        ? (state.direction === 'buy' ? entry - stopPipsInput * p.pipSize : entry + stopPipsInput * p.pipSize)
+        : NaN;
+    } else {
+      stop = parseFloat(els.stop.value);
+    }
+
+    // Target: use manual pips (converted to price) or the direct price field.
+    let target;
+    if(state.targetMode === 'pips'){
+      const targetPipsInput = parseFloat(els.targetPips.value);
+      target = (!isNaN(entry) && !isNaN(targetPipsInput))
+        ? (state.direction === 'buy' ? entry + targetPipsInput * p.pipSize : entry - targetPipsInput * p.pipSize)
+        : NaN;
+    } else {
+      target = parseFloat(els.target.value);
+    }
+
+    const validNumbers = [entry, stop, target].every(v => !isNaN(v));
+
+    if(!validNumbers){
+      els.resStopPips.textContent = '—';
+      els.resTargetPips.textContent = '—';
+      els.resRR.textContent = '—';
+      els.resPipValue.textContent = '—';
+      els.warning.classList.remove('show');
+      return;
+    }
+
+    const stopPips = Math.abs(entry - stop) / p.pipSize;
+    const targetPips = Math.abs(target - entry) / p.pipSize;
+
+    // Keep the price field and the pips field in sync with each other,
+    // regardless of which one is the active input mode.
+    if(state.stopMode === 'pips'){
+      els.stop.value = stop.toFixed(dec);
+    } else {
+      els.stopPips.value = stopPips.toFixed(1);
+    }
+    if(state.targetMode === 'pips'){
+      els.target.value = target.toFixed(dec);
+    } else {
+      els.targetPips.value = targetPips.toFixed(1);
+    }
+    const rr = stopPips > 0 ? targetPips / stopPips : null;
+
+    els.resStopPips.textContent = stopPips.toFixed(1) + ' pips';
+    els.resStopPrice.textContent = stop.toFixed(dec);
+    els.resTargetPips.textContent = targetPips.toFixed(1) + ' pips';
+    els.resTargetPrice.textContent = target.toFixed(dec);
+    els.resRR.textContent = rr!=null ? `1 : ${rr.toFixed(2)}` : '—';
+
+    // Direction validation
+    let warn = '';
+    if(state.direction === 'buy'){
+      if(!(stop < entry)) warn = 'Em uma compra, o stop normalmente fica abaixo do preço de entrada.';
+      else if(!(target > entry)) warn = 'Em uma compra, o alvo normalmente fica acima do preço de entrada.';
+    } else {
+      if(!(stop > entry)) warn = 'Em uma venda, o stop normalmente fica acima do preço de entrada.';
+      else if(!(target < entry)) warn = 'Em uma venda, o alvo normalmente fica abaixo do preço de entrada.';
+    }
+    els.warning.textContent = warn;
+    els.warning.classList.toggle('show', !!warn);
+
+    // Pip value
+    const pv = pipValueInfo(state.pair, entry, lots);
+    els.resPipValue.textContent = pv.display + ' / pip';
+    els.resPipValueNote.textContent = pv.note;
+
+    if(pv.nativeAmount != null){
+      const riskAmt = pv.nativeAmount * stopPips;
+      const rewardAmt = pv.nativeAmount * targetPips;
+      els.resRisk.textContent = `${pv.currencySymbol}${riskAmt.toFixed(2)}`;
+      els.resReward.textContent = `${pv.currencySymbol}${rewardAmt.toFixed(2)}`;
+    } else {
+      els.resRisk.textContent = '—';
+      els.resReward.textContent = '—';
+    }
+
+    renderRuler(entry, stop, target, stopPips, targetPips, dec);
+  }
+
+  function renderRuler(entry, stop, target, stopPips, targetPips, dec){
+    const values = [entry, stop, target];
+    let min = Math.min(...values);
+    let max = Math.max(...values);
+    const span = (max - min) || (entry * 0.001) || 0.001;
+    const pad = span * 0.35;
+    min -= pad;
+    max += pad;
+
+    const pos = v => ((v - min) / (max - min)) * 100;
+
+    const pEntry = pos(entry);
+    const pStop = pos(stop);
+    const pTarget = pos(target);
+
+    els.pinEntry.style.left = pEntry + '%';
+    els.pinStop.style.left = pStop + '%';
+    els.pinTarget.style.left = pTarget + '%';
+
+    els.pinEntryLabel.textContent = entry.toFixed(dec);
+    els.pinStopLabel.textContent = stop.toFixed(dec);
+    els.pinTargetLabel.textContent = target.toFixed(dec);
+
+    const riskLeft = Math.min(pEntry, pStop);
+    const riskWidth = Math.abs(pEntry - pStop);
+    els.zoneRisk.style.left = riskLeft + '%';
+    els.zoneRisk.style.width = riskWidth + '%';
+    els.zoneRiskLabel.style.left = (riskLeft + riskWidth/2) + '%';
+    els.zoneRiskLabel.textContent = stopPips.toFixed(1) + 'p';
+
+    const rewardLeft = Math.min(pEntry, pTarget);
+    const rewardWidth = Math.abs(pEntry - pTarget);
+    els.zoneReward.style.left = rewardLeft + '%';
+    els.zoneReward.style.width = rewardWidth + '%';
+    els.zoneRewardLabel.style.left = (rewardLeft + rewardWidth/2) + '%';
+    els.zoneRewardLabel.textContent = targetPips.toFixed(1) + 'p';
+  }
+
+  function tickClock(){
+    const now = new Date();
+    document.getElementById('clock-time').textContent =
+      now.toLocaleTimeString('pt-BR', {hour12:false});
+    document.getElementById('clock-date').textContent =
+      now.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short'});
+  }
+
+  buildPairList();
+  tickClock();
+  setInterval(tickClock, 1000);
+  render();
+})();
+</script>
+
 <div class="glass importExportPanel">
   <div class="importExportHeader">
     <div class="importExportInfo">
